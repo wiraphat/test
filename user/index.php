@@ -1,28 +1,6 @@
 <?php
 session_start();
 include "connectdb.php";
-
-// รับค่าค้นหา / หมวดหมู่
-$search = $_GET['search'] ?? '';
-$cat_id = $_GET['cat_id'] ?? '';
-
-// ดึงหมวดหมู่
-$cats = $conn->query("SELECT * FROM category ORDER BY cat_name ASC")->fetchAll(PDO::FETCH_ASSOC);
-
-// ดึงสินค้า
-$sql = "SELECT p.*, c.cat_name 
-        FROM product p 
-        LEFT JOIN category c ON p.cat_id = c.cat_id 
-        WHERE 1";
-
-if (!empty($search)) $sql .= " AND p.p_name LIKE :search";
-if (!empty($cat_id)) $sql .= " AND p.cat_id = :cat_id";
-
-$stmt = $conn->prepare($sql);
-if (!empty($search)) $stmt->bindValue(':search', "%$search%");
-if (!empty($cat_id)) $stmt->bindValue(':cat_id', $cat_id);
-$stmt->execute();
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -36,104 +14,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="css/nouislider.min.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <link rel="stylesheet" href="css/style.css">
-
-  <style>
-  body { font-family: 'Montserrat', sans-serif; }
-
-  /* ✅ โลโก้ */
-  .header-logo h3 {
-    font-weight: 800;
-    line-height: 1.3;
-    margin: 0;
-  }
-
-  /* ✅ ช่องค้นหา */
-  .search-box {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border-radius: 30px;
-    overflow: hidden;
-    width: 100%;
-    height: 48px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border: 1px solid #e4e7ed;
-  }
-  .input-select {
-    border: none;
-    background: #fff;
-    color: #2B2D42;
-    font-weight: 500;
-    padding: 0 20px;
-    flex: 0 0 180px;
-    font-size: 15px;
-    height: 100%;
-    border-right: 1px solid #E4E7ED;
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 14px;
-  }
-  .input {
-    border: none;
-    outline: none;
-    background: #fff;
-    padding: 0 18px;
-    flex: 1;
-    font-size: 15px;
-    color: #2B2D42;
-  }
-  .input::placeholder { color: #888; }
-  .search-btn {
-    border: none;
-    background: #D10024;
-    color: #fff;
-    font-weight: 600;
-    font-size: 15px;
-    padding: 0 28px;
-    height: 100%;
-    border-radius: 0 30px 30px 0;
-    transition: all 0.2s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .search-btn:hover {
-    background-color: #a7001c;
-    transform: scale(1.02);
-  }
-
-  /* ✅ รูปสินค้า */
-  .product-img img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 10px;
-    transition: 0.3s ease;
-  }
-  .product-img img:hover {
-    transform: scale(1.05);
-  }
-
-  /* ✅ Wishlist / Cart */
-  .header-ctn {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 30px;
-  }
-  .header-ctn a {
-    color: #fff;
-    text-decoration: none;
-    text-align: center;
-  }
-  .header-ctn a:hover span {
-    color: #D10024;
-  }
-  </style>
 </head>
 <body>
+
   <!-- HEADER -->
   <header>
     <div id="top-header">
@@ -157,49 +40,46 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="header">
       <div class="container">
-        <div class="row align-items-center">
-          <!-- โลโก้ -->
+        <div class="row">
           <div class="col-md-3">
-            <div class="header-logo text-center text-md-start">
+            <div class="header-logo">
               <h3>
                 <b><u><span style="color:#D10024;">MyCommiss</span></u></b><br>
-                <b><u><span style="color:#ffffff;">MyCommiss</span></u></b><br>
+                <b><u><span style="color:#fff;">MyCommiss</span></u></b><br>
                 <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b>
               </h3>
             </div>
           </div>
 
-          <!-- ช่องค้นหา -->
-          <div class="col-md-6 d-flex justify-content-center align-items-center">
-            <div class="header-search w-100" style="max-width:750px;">
-              <form method="get" class="search-box d-flex">
-                <select name="cat_id" class="input-select">
+          <div class="col-md-6">
+            <div class="header-search">
+              <form method="get" action="store.php">
+                <select class="input-select" name="cat_id">
                   <option value="">ประเภทสินค้า</option>
-                  <?php foreach ($cats as $c): ?>
-                    <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
-                      <?= htmlspecialchars($c['cat_name']) ?>
-                    </option>
+                  <?php
+                  $cats = $conn->query("SELECT * FROM category ORDER BY cat_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+                  foreach ($cats as $c):
+                  ?>
+                    <option value="<?= $c['cat_id'] ?>"><?= htmlspecialchars($c['cat_name']) ?></option>
                   <?php endforeach; ?>
                 </select>
-                <input type="text" name="search" class="input" 
-                       value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
-                <button type="submit" class="search-btn"><i class="fa fa-search"></i> ค้นหา</button>
+                <input class="input" name="search" placeholder="ค้นหาสินค้า...">
+                <button class="search-btn"><i class="fa fa-search"></i> ค้นหา</button>
               </form>
             </div>
           </div>
 
-          <!-- Wishlist / Cart -->
-          <div class="col-md-3">
+          <div class="col-md-3 clearfix">
             <div class="header-ctn">
               <div>
                 <a href="wishlist.php">
-                  <i class="fa fa-heart-o fa-lg"></i><br>
+                  <i class="fa fa-heart-o"></i>
                   <span>สินค้าที่ชอบ</span>
                 </a>
               </div>
               <div>
                 <a href="cart.php">
-                  <i class="fa fa-shopping-cart fa-lg"></i><br>
+                  <i class="fa fa-shopping-cart"></i>
                   <span>ตะกร้าของฉัน</span>
                 </a>
               </div>
@@ -210,109 +90,189 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </header>
 
-  <!-- เมนูหลัก -->
+  <!-- NAVIGATION -->
   <nav id="navigation">
     <div class="container">
       <div id="responsive-nav">
         <ul class="main-nav nav navbar-nav">
           <li class="active"><a href="index.php">หน้าหลัก</a></li>
           <li><a href="#">โปรโมชั่น</a></li>
+          <?php foreach ($cats as $cat): ?>
+            <li><a href="store.php?cat_id=<?= $cat['cat_id'] ?>"><?= htmlspecialchars($cat['cat_name']) ?></a></li>
+          <?php endforeach; ?>
         </ul>
       </div>
     </div>
   </nav>
 
-
-		<div id="tab1" class="tab-pane active">
-  <!-- slick container -->
-  <div class="products-slick" data-nav="#slick-nav-1">
-
-    <?php
-    $sql_new = "SELECT p.*, c.cat_name 
-                FROM product p 
-                LEFT JOIN category c ON p.cat_id = c.cat_id 
-                ORDER BY p.p_id DESC LIMIT 10";
-    $newProducts = $conn->query($sql_new)->fetchAll(PDO::FETCH_ASSOC);
-    ?>
-
-    <?php foreach ($newProducts as $p): ?>
-    <div class="product">
-      <div class="product-img">
-        <img src="uploads/<?= htmlspecialchars($p['p_image']) ?>" 
-             alt="<?= htmlspecialchars($p['p_name']) ?>">
-        <div class="product-label">
-          <?php if (!empty($p['discount'])): ?>
-            <span class="sale">-<?= $p['discount'] ?>%</span>
-          <?php endif; ?>
-          <span class="new">NEW</span>
-        </div>
-      </div>
-
-      <div class="product-body">
-        <p class="product-category"><?= htmlspecialchars($p['cat_name']) ?></p>
-        <h3 class="product-name">
-          <a href="product_detail.php?id=<?= $p['p_id'] ?>">
-            <?= htmlspecialchars($p['p_name']) ?>
-          </a>
-        </h3>
-        <h4 class="product-price">
-          ฿<?= number_format($p['price'], 2) ?>
-          <?php if (!empty($p['old_price'])): ?>
-            <del class="product-old-price">฿<?= number_format($p['old_price'], 2) ?></del>
-          <?php endif; ?>
-        </h4>
-
-        <div class="product-rating">
-          <?php for ($i=0; $i<5; $i++): ?>
-            <i class="fa fa-star<?= $i < ($p['rating'] ?? 0) ? '' : '-o' ?>"></i>
-          <?php endfor; ?>
+  <!-- SHOP CATEGORIES -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-xs-6">
+          <div class="shop">
+            <div class="shop-img">
+              <img src="img/shop01.png" alt="">
+            </div>
+            <div class="shop-body">
+              <h3>Laptop<br>Collection</h3>
+              <a href="#" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
         </div>
 
-        <div class="product-btns">
-          <button class="add-to-wishlist"><i class="fa fa-heart-o"></i></button>
-          <button class="add-to-compare"><i class="fa fa-exchange"></i></button>
-          <button class="quick-view"><i class="fa fa-eye"></i></button>
+        <div class="col-md-4 col-xs-6">
+          <div class="shop">
+            <div class="shop-img">
+              <img src="img/shop03.png" alt="">
+            </div>
+            <div class="shop-body">
+              <h3>Accessories<br>Collection</h3>
+              <a href="#" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="add-to-cart">
-        <button class="add-to-cart-btn">
-          <i class="fa fa-shopping-cart"></i> Add to cart
-        </button>
+        <div class="col-md-4 col-xs-6">
+          <div class="shop">
+            <div class="shop-img">
+              <img src="img/shop02.png" alt="">
+            </div>
+            <div class="shop-body">
+              <h3>Cameras<br>Collection</h3>
+              <a href="#" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <?php endforeach; ?>
-
   </div>
-  <div id="slick-nav-1" class="products-slick-nav"></div>
-</div>
 
-	
+  <!-- NEW PRODUCTS -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="section-title">
+            <h3 class="title">New Products</h3>
+            <div class="section-nav">
+              <ul class="section-tab-nav tab-nav">
+                <li class="active"><a data-toggle="tab" href="#tab1">สินค้าทั้งหมด</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
-		<!-- FOOTER -->
-		<footer id="footer">
-			<!-- top footer -->
-			<div class="section">
-				<!-- container -->
-				<div class="container">
-					<!-- row -->
-					<div class="row">
-						<div class="col-md-3 col-xs-6">
-							<div class="footer">
-		
-							</div>
-						</div>
+        <div class="col-md-12">
+          <div class="row">
+            <div class="products-tabs">
+              <div id="tab1" class="tab-pane active">
+                <div class="products-slick" data-nav="#slick-nav-1">
+                  <?php
+                  $sql_new = "SELECT p.*, c.cat_name FROM product p
+                              LEFT JOIN category c ON p.cat_id = c.cat_id
+                              ORDER BY p.p_id DESC LIMIT 10";
+                  $newProducts = $conn->query($sql_new)->fetchAll(PDO::FETCH_ASSOC);
+                  foreach ($newProducts as $p):
+                  ?>
+                  <div class="product">
+                    <div class="product-img">
+                      <img src="uploads/<?= htmlspecialchars($p['p_image']) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+                      <div class="product-label">
+                        <span class="new">NEW</span>
+                      </div>
+                    </div>
+                    <div class="product-body">
+                      <p class="product-category"><?= htmlspecialchars($p['cat_name']) ?></p>
+                      <h3 class="product-name"><a href="product_detail.php?id=<?= $p['p_id'] ?>"><?= htmlspecialchars($p['p_name']) ?></a></h3>
+                      <h4 class="product-price">฿<?= number_format($p['price'], 2) ?></h4>
+                      <div class="product-rating">
+                        <?php for ($i = 0; $i < 5; $i++): ?>
+                          <i class="fa fa-star<?= $i < ($p['rating'] ?? 0) ? '' : '-o' ?>"></i>
+                        <?php endfor; ?>
+                      </div>
+                      <div class="product-btns">
+                        <button class="add-to-wishlist"><i class="fa fa-heart-o"></i></button>
+                        <button class="add-to-compare"><i class="fa fa-exchange"></i></button>
+                        <button class="quick-view"><i class="fa fa-eye"></i></button>
+                      </div>
+                    </div>
+                    <div class="add-to-cart">
+                      <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+                    </div>
+                  </div>
+                  <?php endforeach; ?>
+                </div>
+                <div id="slick-nav-1" class="products-slick-nav"></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-						
-							
+      </div>
+    </div>
+  </div>
 
-		<!-- jQuery Plugins -->
-		<script src="js/jquery.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/slick.min.js"></script>
-		<script src="js/nouislider.min.js"></script>
-		<script src="js/jquery.zoom.min.js"></script>
-		<script src="js/main.js"></script>
+  <!-- TOP SELLING -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="section-title">
+            <h3 class="title">Top Selling</h3>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="products-slick" data-nav="#slick-nav-2">
+            <?php
+            $sql_top = "SELECT p.*, c.cat_name FROM product p
+                        LEFT JOIN category c ON p.cat_id = c.cat_id
+                        ORDER BY p.sold DESC LIMIT 10";
+            $topProducts = $conn->query($sql_top)->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($topProducts as $p):
+            ?>
+            <div class="product">
+              <div class="product-img">
+                <img src="uploads/<?= htmlspecialchars($p['p_image']) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+                <div class="product-label">
+                  <span class="sale">Top</span>
+                </div>
+              </div>
+              <div class="product-body">
+                <p class="product-category"><?= htmlspecialchars($p['cat_name']) ?></p>
+                <h3 class="product-name"><a href="product_detail.php?id=<?= $p['p_id'] ?>"><?= htmlspecialchars($p['p_name']) ?></a></h3>
+                <h4 class="product-price">฿<?= number_format($p['price'], 2) ?></h4>
+                <div class="product-rating">
+                  <?php for ($i = 0; $i < 5; $i++): ?>
+                    <i class="fa fa-star<?= $i < ($p['rating'] ?? 0) ? '' : '-o' ?>"></i>
+                  <?php endfor; ?>
+                </div>
+              </div>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <div id="slick-nav-2" class="products-slick-nav"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	</body>
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="section">
+      <div class="container text-center">
+        <p>© 2025 MyCommiss. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/slick.min.js"></script>
+  <script src="js/nouislider.min.js"></script>
+  <script src="js/jquery.zoom.min.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
 </html>
