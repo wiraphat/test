@@ -210,11 +210,10 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </header>
 
-  <!-- 🛍 แสดงสินค้า -->
-  <?php
+<?php
 include("connectdb.php");
 
-// ดึงข้อมูลสินค้า
+// 🔹 ดึงข้อมูลสินค้าทั้งหมด
 $sql = "SELECT p.*, c.cat_name 
         FROM product p 
         LEFT JOIN category c ON p.cat_id = c.cat_id 
@@ -224,27 +223,26 @@ $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!-- 🔹 Section: สินค้าใหม่ -->
-<div class="section">
+<!-- SECTION: สินค้าใหม่ -->
+<div class="section py-5">
   <div class="container">
-    <div class="row mb-4">
-      <div class="col-12 text-center">
-        <h3 class="fw-bold text-uppercase text-dark">🆕 สินค้าใหม่ล่าสุด</h3>
-        <p class="text-muted">เลือกซื้อสินค้า IT คุณภาพ ราคาคุ้มค่า จาก MyCommiss</p>
-      </div>
+    <div class="row mb-4 text-center">
+      <h3 class="fw-bold text-uppercase">🆕 สินค้าใหม่ล่าสุด</h3>
+      <p class="text-muted">เลือกซื้อสินค้า IT คุณภาพ ราคาคุ้มค่า จาก <span class="text-danger fw-bold">MyCommiss</span></p>
     </div>
 
     <div class="row g-4">
       <?php foreach ($products as $p): ?>
+        <?php
+          // ✅ ใช้ path เต็มจากคลาว
+          $imgPath = "http://212.80.215.29/admin/uploads/" . $p['p_image'];
+        ?>
         <div class="col-lg-3 col-md-4 col-sm-6">
-          <div class="card h-100 shadow-sm border-0 rounded-4">
+          <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
             <div class="position-relative">
-              <?php 
-                $imgPath = !empty($p['p_image']) ? "admin/uploads/" . $p['p_image'] : "img/default.png";
-              ?>
               <img src="<?= htmlspecialchars($imgPath) ?>" 
-                   class="card-img-top rounded-top-4" 
-                   style="height:220px;object-fit:cover;" 
+                   class="card-img-top" 
+                   style="height:230px;object-fit:cover;" 
                    alt="<?= htmlspecialchars($p['p_name']) ?>">
 
               <span class="position-absolute top-0 end-0 bg-danger text-white small px-2 py-1 rounded-start">
@@ -253,7 +251,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div class="card-body text-center">
-              <h6 class="fw-semibold text-dark" style="min-height:45px;">
+              <h6 class="fw-semibold text-dark" style="min-height:48px;">
                 <?= htmlspecialchars($p['p_name']) ?>
               </h6>
               <p class="text-danger fw-bold fs-6 mb-2">
@@ -262,7 +260,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div class="card-footer bg-white border-0 text-center pb-3">
-              <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-outline-dark btn-sm">
+              <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-outline-dark btn-sm me-1">
                 🔍 ดูรายละเอียด
               </a>
               <form action="add_to_cart.php" method="post" class="d-inline">
@@ -279,20 +277,23 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 </div>
 
-<!-- 💅 CSS เพิ่มความสวย -->
+<!-- 💅 Style -->
 <style>
+.card {
+  transition: all 0.3s ease;
+}
 .card:hover {
   transform: translateY(-5px);
-  transition: 0.3s;
+  box-shadow: 0 0 15px rgba(0,0,0,0.15);
 }
 .card img {
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease;
 }
 .card:hover img {
   transform: scale(1.05);
 }
 </style>
-d
+
 	
 
 		<!-- FOOTER -->
