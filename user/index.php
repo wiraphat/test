@@ -168,8 +168,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <style>
-/* ✅ ให้ dropdown + ช่องค้นหา + ปุ่มติดกัน */
-/* 🎯 ปรับช่องค้นหาให้เรียงเท่ากันทุกช่อง */
+/* 🎯 ปรับดีไซน์ช่องค้นหาให้เรียบหรูแบบ Electro */
 .header-search {
   display: flex;
   justify-content: center;
@@ -178,57 +177,73 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 .header-search form {
   display: flex;
-  align-items: stretch; /* ✅ ให้สูงเท่ากันเป๊ะ */
+  align-items: stretch;
   width: 100%;
+  max-width: 720px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 30px;
+  overflow: hidden;
 }
 
+/* 🔻 Dropdown ประเภทสินค้า */
 .header-search .input-select {
-  border: 1px solid #E4E7ED;
-  border-right: none;
-  border-radius: 30px 0 0 30px;
-  padding: 0 15px;           /* ✅ ปรับ padding แนวนอน */
-  height: 46px;              /* ✅ เท่ากับ input */
+  border: none;
+  padding: 0 18px;
+  height: 48px;
   background: #fff;
-  flex: 0 0 170px;
-  font-size: 14px;
-  line-height: 1.2;
-  appearance: none;          /* ✅ ซ่อนสไตล์ default browser */
+  flex: 0 0 180px;
+  font-size: 15px;
+  color: #2B2D42;
+  font-weight: 500;
+  border-radius: 30px 0 0 30px;
+  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='10' viewBox='0 0 24 24' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 15px center;
   background-size: 14px;
 }
 
+/* 🔍 ช่องค้นหา */
 .header-search .input {
-  border: 1px solid #E4E7ED;
-  border-left: none;
-  border-right: none;
-  padding: 0 15px;
-  height: 46px;
+  border: none;
+  background: #fff;
+  padding: 0 20px;
+  height: 48px;
   flex: 1;
-  border-radius: 0;
-  font-size: 14px;
+  font-size: 15px;
+  color: #2B2D42;
+}
+.header-search .input::placeholder {
+  color: #999;
 }
 
+/* 🔴 ปุ่มค้นหา */
 .header-search .search-btn {
-  border-radius: 0 30px 30px 0;
+  border: none;
   background-color: #D10024;
   color: #fff;
-  border: none;
-  padding: 0 25px;
   font-weight: 600;
-  height: 46px;
-  font-size: 14px;
+  height: 48px;
+  padding: 0 28px;
+  border-radius: 0 30px 30px 0;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease-in-out;
+  box-shadow: inset 0 0 0 0 rgba(255,255,255,0.3);
 }
-
+.header-search .search-btn i {
+  margin-right: 6px;
+}
 .header-search .search-btn:hover {
   background-color: #a7001c;
+  box-shadow: inset 0 -3px 0 rgba(255,255,255,0.25);
+  transform: translateY(-1px);
 }
+
 
 </style>
 
