@@ -26,7 +26,7 @@
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     padding: 40px 45px;
-    max-width: 420px;
+    max-width: 700px;
     margin: 60px auto;
     flex-grow: 1;
     transition: 0.3s;
