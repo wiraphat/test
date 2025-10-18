@@ -222,13 +222,13 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </nav>
 <?php
-
-// 🔥 สินค้าขายดี Top 10
+<?php
+// 🔥 สินค้าขายดี Top 10 (จำลองโดยใช้ p_stock น้อยสุดก่อน)
 $topProducts = $conn->query("
   SELECT p.*, c.cat_name 
   FROM product p
   LEFT JOIN category c ON p.cat_id = c.cat_id
-  ORDER BY p.sold_qty DESC
+  ORDER BY p.p_stock ASC
   LIMIT 10
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -248,86 +248,14 @@ $newProducts = $conn->query("
     <i class="fa fa-fire"></i> สินค้าขายดี Top 10
   </h3>
 
-  <div class="row row-cols-1 row-cols-md-5 g-4">
-    <?php foreach ($topProducts as $p): ?>
-      <div class="col">
-        <div class="product text-center p-3 border rounded shadow-sm bg-white">
-          <?php
-            $uploadPath = "admin/uploads/";
-            $imgFile = $p['p_image'];
-            $imgPath = (!empty($imgFile) && file_exists($uploadPath.$imgFile)) 
-              ? $uploadPath.$imgFile 
-              : "img/default.png";
-          ?>
-          <div class="product-img mb-2">
-            <img src="<?= htmlspecialchars($imgPath) ?>" 
-                 alt="<?= htmlspecialchars($p['p_name']) ?>" 
-                 style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
-          </div>
-          <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
-          <h6 class="fw-semibold">
-            <a href="product_detail.php?id=<?= $p['p_id'] ?>" 
-               class="text-dark text-decoration-none">
-              <?= htmlspecialchars($p['p_name']) ?>
-            </a>
-          </h6>
-          <p class="text-danger fw-bold mb-0"><?= number_format($p['p_price'], 2) ?> บาท</p>
-        </div>
-      </div>
-    <?php endforeach; ?>
-  </div>
-</div>
-
-<?php
-// 🔥 สินค้าขายดี Top 10
-try {
-  $topProducts = $conn->query("
-    SELECT p.*, c.cat_name 
-    FROM product p
-    LEFT JOIN category c ON p.cat_id = c.cat_id
-    ORDER BY 
-      CASE 
-        WHEN p.sold_qty IS NULL THEN 1 ELSE 0
-      END, 
-      p.sold_qty DESC
-    LIMIT 10
-  ")->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-  $topProducts = [];
-}
-
-// 🆕 สินค้าใหม่ล่าสุด 10
-try {
-  $newProducts = $conn->query("
-    SELECT p.*, c.cat_name 
-    FROM product p
-    LEFT JOIN category c ON p.cat_id = c.cat_id
-    ORDER BY 
-      CASE 
-        WHEN p.created_at IS NULL THEN 1 ELSE 0
-      END,
-      p.created_at DESC
-    LIMIT 10
-  ")->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-  $newProducts = [];
-}
-?>
-
-<!-- 🔥 สินค้าขายดี Top 10 -->
-<div class="container my-5">
-  <h3 class="text-center text-danger fw-bold mb-4">
-    <i class="fa fa-fire"></i> สินค้าขายดี Top 10
-  </h3>
-
   <?php if (empty($topProducts)): ?>
     <p class="text-center text-muted">ยังไม่มีข้อมูลสินค้าขายดี</p>
   <?php else: ?>
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($topProducts as $p): ?>
       <?php
-        $uploadPath = "admin/uploads/";
-        $imgFile = $p['p_image'] ?? '';
+        $uploadPath = "../admin/uploads/"; // ✅ เปลี่ยน path ให้ถูกกับฝั่ง user
+        $imgFile = $p['p_image'];
         $imgPath = (!empty($imgFile) && file_exists($uploadPath . $imgFile))
           ? $uploadPath . $imgFile
           : "img/default.png";
@@ -357,7 +285,7 @@ try {
 <!-- 🆕 สินค้าใหม่ล่าสุด 10 -->
 <div class="container my-5">
   <h3 class="text-center text-primary fw-bold mb-4">
-    <i class="fa fa-star"></i> สินค้าใหม่ล่าสุด
+    <i class="fa fa-star"></i> สินค้ามาใหม่ล่าสุด
   </h3>
 
   <?php if (empty($newProducts)): ?>
@@ -366,8 +294,8 @@ try {
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($newProducts as $p): ?>
       <?php
-        $uploadPath = "admin/uploads/";
-        $imgFile = $p['p_image'] ?? '';
+        $uploadPath = "../admin/uploads/"; 
+        $imgFile = $p['p_image'];
         $imgPath = (!empty($imgFile) && file_exists($uploadPath . $imgFile))
           ? $uploadPath . $imgFile
           : "img/default.png";
@@ -394,7 +322,6 @@ try {
   <?php endif; ?>
 </div>
 
-  
 
   <footer id="footer">
     <div class="section">
