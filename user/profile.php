@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $_SESSION['customer_name'] = $name;
     $_SESSION['toast_success'] = "✅ บันทึกข้อมูลเรียบร้อยแล้ว";
-    header("Location: index.php");
+    header("Location: profile.php");
     exit;
   }
 }
@@ -51,27 +51,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <title>โปรไฟล์ของฉัน | MyCommiss</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    body { background-color: #f8f9fa; }
+    body {
+      background-color: #F6F7F8;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
     .profile-card {
       max-width: 700px;
-      margin: 40px auto;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin: 60px auto;
+      background: #FFF;
+      border-radius: 20px;
+      border: 1px solid #E4E7ED;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+      transition: 0.3s;
     }
+
+    .profile-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
     .card-header {
-      background: #212529;
-      color: #fff;
-      font-weight: bold;
-      border-radius: 15px 15px 0 0;
+      background: #1E1F29;
+      color: #FFF;
+      font-weight: 600;
+      font-size: 1.3rem;
+      border-radius: 20px 20px 0 0;
     }
-    .btn:hover { transform: scale(1.05); transition: 0.2s; }
+
+    .btn-primary {
+      background-color: #2575FC;
+      border: none;
+      font-weight: 600;
+      border-radius: 10px;
+    }
+
+    .btn-success {
+      background-color: #00B894;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .btn-secondary {
+      background-color: #6C757D;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover { background-color: #1a5fd9; }
+    .btn-success:hover { background-color: #009774; }
+    .btn-secondary:hover { background-color: #555; }
+
+    footer {
+      background-color: #1E1F29;
+      color: #FFF;
+      text-align: center;
+      padding: 12px 0;
+      font-size: 14px;
+      margin-top: auto;
+    }
+
     .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
+      z-index: 3000;
     }
   </style>
 </head>
@@ -80,9 +128,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include("navbar_user.php"); ?>
 
 <!-- 🔔 Toast แจ้งเตือน -->
-<div class="toast-container">
+<div class="toast-container position-fixed top-0 end-0 p-3">
   <?php if (isset($_SESSION['toast_error'])): ?>
-    <div class="toast align-items-center text-bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast align-items-center text-bg-danger border-0 show" role="alert">
       <div class="d-flex">
         <div class="toast-body"><?= $_SESSION['toast_error'] ?></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -92,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <?php if (isset($_SESSION['toast_success'])): ?>
-    <div class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast align-items-center text-bg-success border-0 show" role="alert">
       <div class="d-flex">
         <div class="toast-body"><?= $_SESSION['toast_success'] ?></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -102,51 +150,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 </div>
 
+<!-- ✅ กล่องโปรไฟล์ -->
 <div class="container">
   <div class="profile-card">
-    <div class="card-header text-center py-3">👤 โปรไฟล์ของฉัน</div>
+    <div class="card-header text-center py-3">
+      <i class="fa fa-user-circle me-2"></i> โปรไฟล์ของฉัน
+    </div>
     <div class="card-body p-4">
-
       <form method="POST">
         <div class="mb-3">
           <label class="form-label fw-semibold">ชื่อ - นามสกุล</label>
-          <input type="text" name="name" value="<?= htmlspecialchars($user['name']) ?>" class="form-control" required>
+          <input type="text" name="name" value="<?= htmlspecialchars($user['name']) ?>" class="form-control rounded-3" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-semibold">อีเมล</label>
-          <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" class="form-control" required>
+          <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" class="form-control rounded-3" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-semibold">เบอร์โทรศัพท์</label>
-          <input type="text" name="phone" value="<?= htmlspecialchars($user['phone']) ?>" 
-                 class="form-control" maxlength="10" pattern="[0-9]{10}"
+          <input type="text" name="phone" value="<?= htmlspecialchars($user['phone']) ?>"
+                 class="form-control rounded-3" maxlength="10" pattern="[0-9]{10}"
                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-semibold">ที่อยู่จัดส่ง</label>
-          <textarea name="address" rows="3" class="form-control"><?= htmlspecialchars($user['address']) ?></textarea>
+          <textarea name="address" rows="3" class="form-control rounded-3"><?= htmlspecialchars($user['address']) ?></textarea>
         </div>
 
         <div class="d-flex justify-content-center align-items-center gap-3 mt-4 flex-wrap">
-          <a href="index.php" class="btn btn-secondary">⬅️ กลับหน้าหลัก</a>
-          <a href="change_password.php" class="btn btn-success">🔑 เปลี่ยนรหัสผ่าน</a>
-          <button type="submit" class="btn btn-primary">💾 บันทึกข้อมูล</button>
+          <a href="index.php" class="btn btn-secondary px-4">⬅️ กลับหน้าหลัก</a>
+          <a href="change_password.php" class="btn btn-success px-4">🔑 เปลี่ยนรหัสผ่าน</a>
+          <button type="submit" class="btn btn-primary px-4">💾 บันทึกข้อมูล</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<footer class="text-center py-3 mt-5 bg-dark text-white">
+<footer>
   © <?= date('Y') ?> MyCommiss | โปรไฟล์ผู้ใช้
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // ✅ Toast แสดง 5 วิแล้วปิดอัตโนมัติ
   document.addEventListener("DOMContentLoaded", () => {
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
     toastElList.forEach(toastEl => {
