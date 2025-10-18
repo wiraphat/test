@@ -1,3 +1,29 @@
+<?php
+session_start();
+include("connectdb.php");
+
+// 🔹 ตรวจสอบการเข้าสู่ระบบ
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  $email = trim($_POST['email']);
+  $password = trim($_POST['password']);
+
+  $stmt = $conn->prepare("SELECT * FROM customers WHERE email = ?");
+  $stmt->execute([$email]);
+  $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['customer_id'] = $user['customer_id'];
+    $_SESSION['customer_name'] = $user['name'];
+    $_SESSION['toast_success'] = "✅ เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ " . htmlspecialchars($user['name']);
+    header("Location: index.php");
+    exit;
+  } else {
+    $_SESSION['toast_error'] = "❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+    header("Location: login.php");
+    exit;
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -14,45 +40,30 @@
   body {
     background: #F6F7F8;
     font-family: 'Montserrat', sans-serif;
-    min-height: 100vh;              /* ✅ ทำให้สูงเท่าจอ */
+    min-height: 100vh;
     display: flex;
-    flex-direction: column;         /* ✅ จัดแนวตั้ง */
+    flex-direction: column;
   }
 
   /* กล่อง login */
   .login-wrapper {
-  background: #fff;
-  border: 1px solid #E4E7ED;
-  border-radius: 20px; /* มุมโค้งนุ่มขึ้น */
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); /* เงานุ่มธรรมชาติ */
-  padding: 50px 60px; /* เพิ่มความโปร่ง */
-  max-width: 520px; /* ✅ กว้างขึ้นเล็กน้อย */
-  min-height: 450px; /* ✅ เพิ่มความสูงให้สมดุลกับฟอร์ม */
-  margin: 60px auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* จัดให้อยู่ตรงกลางในกล่อง */
-  transition: all 0.3s ease;
-}
-
-.login-wrapper:hover {
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-  transform: translateY(-4px);
-}
-<h3 class="login-title"><i class="fa fa-lock"></i> เข้าสู่ระบบ</h3>
-.login-title {
-  color: #2B2D42;
-  font-weight: 700;
-  font-size: 1.5rem;
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.login-title i {
-  color: #D10024;
-  margin-right: 6px;
-}
-
+    background: #fff;
+    border: 1px solid #E4E7ED;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    padding: 50px 60px;
+    max-width: 520px;
+    min-height: 450px;
+    margin: 60px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  .login-wrapper:hover {
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
 
   /* หัวข้อ */
   .login-title {
@@ -62,7 +73,6 @@
     font-size: 1.4rem;
     margin-bottom: 25px;
   }
-
   .login-title i {
     color: #D10024;
     margin-right: 6px;
@@ -102,26 +112,27 @@
     text-decoration: none;
     font-weight: 500;
   }
-
   .text-link:hover {
     text-decoration: underline;
   }
 
-  /* ✅ Footer ติดขอบล่าง */
   footer {
     background: #15161D;
     padding: 20px;
     color: #fff;
     text-align: center;
-    margin-top: auto;               /* ✅ บังคับชิดขอบล่าง */
+    margin-top: auto;
     font-size: 0.9rem;
   }
-</style>
 
+  .toast-container {
+    z-index: 3000;
+  }
+  </style>
 </head>
 <body>
 
-<!-- 🔹 Header -->
+<!-- ✅ Header -->
 <header>
   <div id="header" style="background:#15161D; padding:20px 0;">
     <div class="container text-center">
@@ -130,13 +141,36 @@
   </div>
 </header>
 
-<!-- 🔹 Login Form -->
+<!-- ✅ Toast แจ้งเตือน -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <?php if (isset($_SESSION['toast_success'])): ?>
+    <div class="toast align-items-center text-bg-success border-0 show">
+      <div class="d-flex">
+        <div class="toast-body"><?= $_SESSION['toast_success'] ?></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+    <?php unset($_SESSION['toast_success']); ?>
+  <?php endif; ?>
+
+  <?php if (isset($_SESSION['toast_error'])): ?>
+    <div class="toast align-items-center text-bg-danger border-0 show">
+      <div class="d-flex">
+        <div class="toast-body"><?= $_SESSION['toast_error'] ?></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+    <?php unset($_SESSION['toast_error']); ?>
+  <?php endif; ?>
+</div>
+
+<!-- ✅ ฟอร์มเข้าสู่ระบบ -->
 <div class="login-wrapper">
   <div class="login-title">
     <i class="fa fa-lock"></i> เข้าสู่ระบบ
   </div>
 
-  <form method="post" action="index.php">
+  <form method="post">
     <div class="mb-3">
       <input type="email" name="email" class="input w-100" placeholder="Email" required>
     </div><br>
@@ -153,12 +187,21 @@
   </form>
 </div>
 
-<!-- 🔹 Footer -->
+<!-- ✅ Footer -->
 <footer>
   © <?= date('Y') ?> MyCommiss | เข้าสู่ระบบ
 </footer>
 
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script>
+  // ✅ Toast auto-hide
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.toast').forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
+      toast.show();
+    });
+  });
+</script>
 </body>
 </html>
