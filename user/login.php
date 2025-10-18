@@ -21,21 +21,38 @@
 
   /* กล่อง login */
   .login-wrapper {
-    background: #FFF;
-    border: 1px solid #E4E7ED;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    padding: 40px 45px;
-    max-width: 700px;
-    margin: 60px auto;
-    flex-grow: 1;
-    transition: 0.3s;
-  }
+  background: #fff;
+  border: 1px solid #E4E7ED;
+  border-radius: 20px; /* มุมโค้งนุ่มขึ้น */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); /* เงานุ่มธรรมชาติ */
+  padding: 50px 60px; /* เพิ่มความโปร่ง */
+  max-width: 520px; /* ✅ กว้างขึ้นเล็กน้อย */
+  min-height: 450px; /* ✅ เพิ่มความสูงให้สมดุลกับฟอร์ม */
+  margin: 60px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* จัดให้อยู่ตรงกลางในกล่อง */
+  transition: all 0.3s ease;
+}
 
-  .login-wrapper:hover {
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-    transform: translateY(-2px);
-  }
+.login-wrapper:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+<h3 class="login-title"><i class="fa fa-lock"></i> เข้าสู่ระบบ</h3>
+.login-title {
+  color: #2B2D42;
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.login-title i {
+  color: #D10024;
+  margin-right: 6px;
+}
+
 
   /* หัวข้อ */
   .login-title {
