@@ -136,7 +136,7 @@
     <i class="fa fa-lock"></i> เข้าสู่ระบบ
   </div>
 
-  <form method="post" action="login_process.php">
+  <form method="post" action="index.php">
     <div class="mb-3">
       <input type="email" name="email" class="input w-100" placeholder="Email" required>
     </div><br>
