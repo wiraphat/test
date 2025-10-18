@@ -29,7 +29,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="UTF-8">
   <title>MyCommiss | หน้าร้าน</title>
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/slick.css">
   <link rel="stylesheet" href="css/slick-theme.css">
@@ -38,10 +38,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="css/style.css">
 
   <style>
-  /* ✅ ปรับโครงสร้าง header ให้ตรงกลางสวย */
-  #header .row {
-    align-items: center;
-  }
+  body { font-family: 'Montserrat', sans-serif; }
 
   /* ✅ โลโก้ */
   .header-logo h3 {
@@ -51,42 +48,72 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   /* ✅ ช่องค้นหา */
-  .header-search {
+  .search-box {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 30px;
+    overflow: hidden;
+    width: 100%;
+    height: 48px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid #e4e7ed;
+  }
+  .input-select {
+    border: none;
+    background: #fff;
+    color: #2B2D42;
+    font-weight: 500;
+    padding: 0 20px;
+    flex: 0 0 180px;
+    font-size: 15px;
+    height: 100%;
+    border-right: 1px solid #E4E7ED;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 14px;
+  }
+  .input {
+    border: none;
+    outline: none;
+    background: #fff;
+    padding: 0 18px;
+    flex: 1;
+    font-size: 15px;
+    color: #2B2D42;
+  }
+  .input::placeholder { color: #888; }
+  .search-btn {
+    border: none;
+    background: #D10024;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 0 28px;
+    height: 100%;
+    border-radius: 0 30px 30px 0;
+    transition: all 0.2s ease-in-out;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-
-  .header-search .input-select {
-    border-radius: 30px 0 0 30px !important;
-    border: 1px solid #E4E7ED;
-    border-right: none;
-    padding: 10px 15px;
-    height: 42px;
-    background: #fff;
-  }
-
-  .header-search .input {
-    border: 1px solid #E4E7ED;
-    border-left: none;
-    border-right: none;
-    padding: 10px 15px;
-    height: 42px;
-    flex: 1;
-    border-radius: 0;
-  }
-
-  .header-search .search-btn {
-    border-radius: 0 30px 30px 0 !important;
-    background-color: #D10024;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-weight: 600;
-  }
-
-  .header-search .search-btn:hover {
+  .search-btn:hover {
     background-color: #a7001c;
+    transform: scale(1.02);
+  }
+
+  /* ✅ รูปสินค้า */
+  .product-img img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: 0.3s ease;
+  }
+  .product-img img:hover {
+    transform: scale(1.05);
   }
 
   /* ✅ Wishlist / Cart */
@@ -96,13 +123,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     align-items: center;
     gap: 30px;
   }
-
   .header-ctn a {
     color: #fff;
     text-decoration: none;
     text-align: center;
   }
-
   .header-ctn a:hover span {
     color: #D10024;
   }
@@ -111,7 +136,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <!-- HEADER -->
   <header>
-    <!-- TOP HEADER -->
     <div id="top-header">
       <div class="container">
         <ul class="header-links pull-left">
@@ -130,13 +154,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </ul>
       </div>
     </div>
-    <!-- /TOP HEADER -->
 
-    <!-- MAIN HEADER -->
     <div id="header">
       <div class="container">
         <div class="row align-items-center">
-          <!--  โลโก้ -->
+          <!-- โลโก้ -->
           <div class="col-md-3">
             <div class="header-logo text-center text-md-start">
               <h3>
@@ -147,109 +169,26 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
           </div>
 
-     <!-- 🟦 ช่องค้นหา -->
-<!-- 🟦 ช่องค้นหา -->
-<div class="col-md-6 d-flex justify-content-center align-items-center">
-  <div class="header-search w-100" style="max-width:750px;">
-    <form method="get" class="search-box d-flex">
-      
-      <!-- 🔻 ประเภทสินค้า -->
-      <select name="cat_id" class="input-select">
-        <option value="">ประเภทสินค้า</option>
-        <?php foreach ($cats as $c): ?>
-          <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
-            <?= htmlspecialchars($c['cat_name']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
+          <!-- ช่องค้นหา -->
+          <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <div class="header-search w-100" style="max-width:750px;">
+              <form method="get" class="search-box d-flex">
+                <select name="cat_id" class="input-select">
+                  <option value="">ประเภทสินค้า</option>
+                  <?php foreach ($cats as $c): ?>
+                    <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
+                      <?= htmlspecialchars($c['cat_name']) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+                <input type="text" name="search" class="input" 
+                       value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
+                <button type="submit" class="search-btn"><i class="fa fa-search"></i> ค้นหา</button>
+              </form>
+            </div>
+          </div>
 
-      <!-- 🔍 ช่องค้นหา -->
-      <input type="text" name="search" class="input" 
-             value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
-
-      <!-- 🔴 ปุ่มค้นหา -->
-      <button type="submit" class="search-btn">
-        <i class="fa fa-search"></i> ค้นหา
-      </button>
-    </form>
-  </div>
-</div>
-
-<style>
-/* ✅ โครงสร้างหลัก */
-.search-box {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border-radius: 30px;
-  overflow: hidden;
-  width: 100%;
-  height: 48px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  border: 1px solid #e4e7ed;
-}
-
-/* 🔻 Dropdown */
-.input-select {
-  border: none;
-  background: #fff;
-  color: #2B2D42;
-  font-weight: 500;
-  padding: 0 20px;
-  flex: 0 0 180px;
-  font-size: 15px;
-  height: 100%;
-  border-right: 1px solid #E4E7ED;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 14px;
-}
-
-/* 🔍 ช่อง input */
-.input {
-  border: none;
-  outline: none;
-  background: #fff;
-  padding: 0 18px;
-  flex: 1;
-  font-size: 15px;
-  color: #2B2D42;
-}
-.input::placeholder {
-  color: #888;
-}
-
-/* 🔴 ปุ่มค้นหา */
-.search-btn {
-  border: none;
-  background: #D10024;
-  color: #fff;
-  font-weight: 600;
-  font-size: 15px;
-  padding: 0 28px;
-  height: 100%;
-  border-radius: 0 30px 30px 0;
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.search-btn i {
-  margin-right: 6px;
-}
-.search-btn:hover {
-  background-color: #a7001c;
-  transform: scale(1.02);
-}
-</style>
-
-
-
-          <!-- 🟨 Wishlist / Cart -->
+          <!-- Wishlist / Cart -->
           <div class="col-md-3">
             <div class="header-ctn">
               <div>
@@ -270,9 +209,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
   </header>
-  <!-- /HEADER -->
 
-  <!-- NAVIGATION -->
+  <!-- เมนูหลัก -->
   <nav id="navigation">
     <div class="container">
       <div id="responsive-nav">
@@ -283,9 +221,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
   </nav>
-  <!-- /NAVIGATION -->
 
-  <!-- SECTION: PRODUCT LIST -->
+  <!-- สินค้า -->
   <div class="section">
     <div class="container">
       <div class="row">
@@ -295,10 +232,16 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <div class="product">
                 <div class="product-img">
                   <?php
-                    $imgPath = "../admin/uploads/" . $p['p_image'];
-                    if (!file_exists($imgPath) || empty($p['p_image'])) $imgPath = "img/default.png";
+                    // ✅ ตรวจสอบ path รูปภาพอัตโนมัติ
+                    $uploadPath = "admin/uploads/"; // ← เปลี่ยนตามโฟลเดอร์จริงถ้าต่าง
+                    $imgFile = $p['p_image'];
+                    if (!empty($imgFile) && file_exists($uploadPath . $imgFile)) {
+                      $imgPath = $uploadPath . $imgFile;
+                    } else {
+                      $imgPath = "img/default.png";
+                    }
                   ?>
-                  <img src="<?= $imgPath ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+                  <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
                   <div class="product-label"><span class="new">NEW</span></div>
                 </div>
                 <div class="product-body">
@@ -330,7 +273,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer id="footer">
     <div class="section">
       <div class="container text-center">
@@ -341,7 +283,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </footer>
 
-  <!-- JS -->
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/slick.min.js"></script>
