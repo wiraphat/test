@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "../backend/config/connectdb.php";
+include "connectdb.php";
 
 // รับค่าค้นหา / หมวดหมู่
 $search = $_GET['search'] ?? '';
