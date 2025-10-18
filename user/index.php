@@ -148,9 +148,10 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
 
      <!-- 🟦 ช่องค้นหา -->
+<!-- 🟦 ช่องค้นหา -->
 <div class="col-md-6 d-flex justify-content-center align-items-center">
-  <div class="header-search w-100" style="max-width:720px;">
-    <form method="get" class="d-flex w-100 align-items-stretch">
+  <div class="header-search w-100" style="max-width:750px;">
+    <form method="get" class="search-box d-flex">
       
       <!-- 🔻 ประเภทสินค้า -->
       <select name="cat_id" class="input-select">
@@ -163,7 +164,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </select>
 
       <!-- 🔍 ช่องค้นหา -->
-      <input type="text" name="search" class="input" value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
+      <input type="text" name="search" class="input" 
+             value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
 
       <!-- 🔴 ปุ่มค้นหา -->
       <button type="submit" class="search-btn">
@@ -174,73 +176,30 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <style>
-/* 🎯 ช่องค้นหาติดกับประเภทสินค้า */
-.header-search {
+/* ✅ โครงสร้างหลัก */
+.search-box {
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-.header-search form {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
+  background: #fff;
   border-radius: 30px;
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  width: 100%;
+  height: 48px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: 1px solid #e4e7ed;
 }
 
-/* 🔻 ประเภทสินค้า */
-.header-search .input-select {
+/* 🔻 Dropdown */
+.input-select {
   border: none;
-  padding: 0 18px;
-  height: 48px;
   background: #fff;
-  flex: 0 0 170px;
-  font-size: 15px;
   color: #2B2D42;
   font-weight: 500;
-  border-radius: 30px 0 0 30px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 14px;
-}
-
-/* 🔍 ช่องค้นหา */
-/* 🎯 ช่องค้นหาแบบ Electro ปุ่มแดงเต็มแนบขอบ */
-.header-search {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.header-search form {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  max-width: 720px;
-  background: #fff;
-  border-radius: 30px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  overflow: visible; /* ✅ ปล่อยให้ปุ่มแดงแสดงเต็ม */
-}
-
-/* 🔻 Dropdown ประเภทสินค้า */
-.header-search .input-select {
-  border: none;
-  padding: 0 18px;
-  height: 48px;
-  background: #fff;
+  padding: 0 20px;
   flex: 0 0 180px;
   font-size: 15px;
-  color: #2B2D42;
-  font-weight: 500;
-  border-radius: 30px 0 0 30px;
+  height: 100%;
+  border-right: 1px solid #E4E7ED;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -250,85 +209,44 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   background-size: 14px;
 }
 
-/* 🔍 ช่องค้นหา */
-/* 🎯 ช่องค้นหาดีไซน์ Electro สีพื้นขาวเท่ากันทั้งแถบ */
-.header-search {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.header-search form {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  max-width: 720px;
-  background: #ffffff; /* ✅ พื้นขาวเท่ากันทั้งแถบ */
-  border-radius: 30px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  overflow: hidden; /* ✅ ให้ขอบโค้งตัดเรียบ */
-}
-
-/* 🔻 ประเภทสินค้า */
-.header-search .input-select {
+/* 🔍 ช่อง input */
+.input {
   border: none;
+  outline: none;
+  background: #fff;
   padding: 0 18px;
-  height: 48px;
-  background: #ffffff; /* ✅ สีขาวตรงกับ input */
-  flex: 0 0 180px;
-  font-size: 15px;
-  color: #2B2D42;
-  font-weight: 500;
-  border-radius: 30px 0 0 30px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 14px;
-}
-
-/* 🔍 ช่องค้นหา */
-.header-search .input {
-  border: none;
-  background: #ffffff; /* ✅ สีเดียวกับ select */
-  padding: 0 18px;
-  height: 48px;
   flex: 1;
   font-size: 15px;
   color: #2B2D42;
-  border-left: 1px solid #E4E7ED;
 }
-.header-search .input::placeholder {
-  color: #999;
+.input::placeholder {
+  color: #888;
 }
 
 /* 🔴 ปุ่มค้นหา */
-.header-search .search-btn {
+.search-btn {
   border: none;
-  background-color: #D10024; /* ✅ สีแดงหลัก Electro */
+  background: #D10024;
   color: #fff;
   font-weight: 600;
-  height: 48px;
-  padding: 0 30px;
-  border-radius: 0 30px 30px 0;
   font-size: 15px;
+  padding: 0 28px;
+  height: 100%;
+  border-radius: 0 30px 30px 0;
+  transition: all 0.2s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease-in-out;
 }
-.header-search .search-btn i {
+.search-btn i {
   margin-right: 6px;
 }
-.header-search .search-btn:hover {
+.search-btn:hover {
   background-color: #a7001c;
-  transform: translateY(-1px);
+  transform: scale(1.02);
 }
-
-
 </style>
+
 
 
           <!-- 🟨 Wishlist / Cart -->
