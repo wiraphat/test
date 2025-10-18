@@ -69,7 +69,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <div class="col-md-3">
             <div class="header-logo">
               <a href="index.php" class="logo">
-                <img src="img/logo.png" alt="MyCommiss">
+                <b><u>MyCommiss</u></b><br>
+                <b><u>MyCommiss</u></b><br>
+                <b><u>MyCommiss</u></b>
               </a>
             </div>
           </div>
