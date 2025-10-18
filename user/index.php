@@ -1,26 +1,26 @@
 <?php
 session_start();
-include("connectdb.php");
+include "../backend/config/connectdb.php";
 
-// 🔍 รับค่าค้นหา
+// รับค่าค้นหา / หมวดหมู่
 $search = $_GET['search'] ?? '';
-$cat = $_GET['cat'] ?? '';
+$cat_id = $_GET['cat_id'] ?? '';
 
-// 🔹 ดึงหมวดหมู่
-$cats = $conn->query("SELECT * FROM category")->fetchAll(PDO::FETCH_ASSOC);
+// ดึงหมวดหมู่
+$cats = $conn->query("SELECT * FROM category ORDER BY cat_name ASC")->fetchAll(PDO::FETCH_ASSOC);
 
-// 🔹 ดึงสินค้า
+// ดึงสินค้า
 $sql = "SELECT p.*, c.cat_name 
         FROM product p 
         LEFT JOIN category c ON p.cat_id = c.cat_id 
         WHERE 1";
 
 if (!empty($search)) $sql .= " AND p.p_name LIKE :search";
-if (!empty($cat)) $sql .= " AND p.cat_id = :cat";
+if (!empty($cat_id)) $sql .= " AND p.cat_id = :cat_id";
 
 $stmt = $conn->prepare($sql);
 if (!empty($search)) $stmt->bindValue(':search', "%$search%");
-if (!empty($cat)) $stmt->bindValue(':cat', $cat);
+if (!empty($cat_id)) $stmt->bindValue(':cat_id', $cat_id);
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -29,203 +29,175 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="UTF-8">
   <title>MyCommiss | หน้าร้าน</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: #F6F7F8;
-      color: #2B2D42;
-    }
-
-    /* 🔹 Navbar */
-    .navbar {
-      background-color: #15161D;
-    }
-    .navbar-brand {
-      color: #FFF !important;
-      font-weight: 700;
-      font-size: 1.5rem;
-    }
-    .navbar-brand span {
-      color: #D10024;
-    }
-    .nav-link {
-      color: #FFF !important;
-      margin: 0 10px;
-      transition: 0.2s;
-    }
-    .nav-link:hover {
-      color: #D10024 !important;
-    }
-
-    /* 🔹 การ์ดสินค้า */
-    .product-card {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid #E4E7ED;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.06);
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    }
-
-    .product-card img {
-      height: 200px;
-      object-fit: cover;
-      border-bottom: 1px solid #E4E7ED;
-    }
-
-    .product-card .price {
-      color: #D10024;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .btn-red {
-      background-color: #D10024;
-      color: #FFF;
-      border-radius: 30px;
-      transition: 0.2s;
-    }
-    .btn-red:hover {
-      background-color: #a5001a;
-    }
-
-    footer {
-      background: #15161D;
-      color: #FFF;
-      padding: 20px 0;
-      text-align: center;
-      margin-top: 40px;
-    }
-
-    .toast-container {
-      z-index: 3000;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/slick.css">
+  <link rel="stylesheet" href="css/slick-theme.css">
+  <link rel="stylesheet" href="css/nouislider.min.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<!-- 🔺 Navbar -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="index.php">My<span>Commiss</span></a>
-    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
-      <i class="fa fa-bars"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="menu">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a href="index.php" class="nav-link">หน้าแรก</a></li>
-        <li class="nav-item"><a href="store.php" class="nav-link active text-danger">หน้าร้าน</a></li>
-        <?php if(isset($_SESSION['customer_id'])): ?>
-          <li class="nav-item"><a href="profile.php" class="nav-link"><i class="fa fa-user"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?></a></li>
-          <li class="nav-item"><a href="logout.php" class="nav-link"><i class="fa fa-sign-out-alt"></i> ออกจากระบบ</a></li>
-        <?php else: ?>
-          <li class="nav-item"><a href="login.php" class="nav-link"><i class="fa fa-sign-in-alt"></i> เข้าสู่ระบบ</a></li>
-        <?php endif; ?>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<!-- 🔔 Toast -->
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <?php if (isset($_SESSION['toast_success'])): ?>
-    <div class="toast align-items-center text-bg-success border-0 show">
-      <div class="d-flex">
-        <div class="toast-body"><?= $_SESSION['toast_success'] ?></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+  <!-- HEADER -->
+  <header>
+    <!-- TOP HEADER -->
+    <div id="top-header">
+      <div class="container">
+        <ul class="header-links pull-left">
+          <li><a href="#"><i class="fa fa-phone"></i> +66 81-234-5678</a></li>
+          <li><a href="#"><i class="fa fa-envelope-o"></i> support@mycommiss.com</a></li>
+          <li><a href="#"><i class="fa fa-map-marker"></i> Bangkok, Thailand</a></li>
+        </ul>
+        <ul class="header-links pull-right">
+          <?php if (isset($_SESSION['customer_id'])): ?>
+            <li><a href="profile.php"><i class="fa fa-user-o"></i> บัญชีของฉัน</a></li>
+            <li><a href="logout.php"><i class="fa fa-sign-out"></i> ออกจากระบบ</a></li>
+          <?php else: ?>
+            <li><a href="login.php"><i class="fa fa-sign-in"></i> เข้าสู่ระบบ</a></li>
+            <li><a href="register.php"><i class="fa fa-user-plus"></i> สมัครสมาชิก</a></li>
+          <?php endif; ?>
+        </ul>
       </div>
     </div>
-    <?php unset($_SESSION['toast_success']); ?>
-  <?php endif; ?>
-</div>
+    <!-- /TOP HEADER -->
 
-<!-- 🔍 Search Section -->
-<div class="container mt-5">
-  <div class="card border-0 shadow-sm p-4 mb-4">
-    <form class="row g-2 align-items-center" method="get">
-      <div class="col-md-3">
-        <select name="cat" class="form-select">
-          <option value="">หมวดหมู่ทั้งหมด</option>
-          <?php foreach ($cats as $c): ?>
-            <option value="<?= $c['cat_id'] ?>" <?= $cat == $c['cat_id'] ? 'selected' : '' ?>>
-              <?= htmlspecialchars($c['cat_name']) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="col-md-7">
-        <input type="text" name="search" class="form-control" placeholder="ค้นหาชื่อสินค้า..." value="<?= htmlspecialchars($search) ?>">
-      </div>
-      <div class="col-md-2 d-grid">
-        <button class="btn btn-red"><i class="fa fa-search"></i> ค้นหา</button>
-      </div>
-    </form>
-  </div>
-
-  <!-- 🛒 แสดงสินค้า -->
-  <div class="row g-4">
-    <?php if (count($products) > 0): ?>
-      <?php foreach ($products as $p): ?>
-        <?php
-          $imagePath = "../admin/uploads/" . $p['p_image'];
-          if (!file_exists($imagePath) || empty($p['p_image'])) {
-            $imagePath = "img/default.png";
-          }
-        ?>
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-          <div class="product-card h-100">
-            <img src="<?= $imagePath ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" class="w-100">
-            <div class="p-3">
-              <h6 class="text-truncate" title="<?= htmlspecialchars($p['p_name']) ?>">
-                <?= htmlspecialchars($p['p_name']) ?>
-              </h6>
-              <p class="price mb-2"><?= number_format($p['p_price'], 2) ?> บาท</p>
-              <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-outline-dark btn-sm w-100 mb-2">
-                <i class="fa fa-eye"></i> ดูรายละเอียด
+    <!-- MAIN HEADER -->
+    <div id="header">
+      <div class="container">
+        <div class="row">
+          <!-- LOGO -->
+          <div class="col-md-3">
+            <div class="header-logo">
+              <a href="index.php" class="logo">
+                <img src="img/logo.png" alt="MyCommiss">
               </a>
+            </div>
+          </div>
 
-              <?php if (isset($_SESSION['customer_id'])): ?>
-                <form method="post" action="cart_add.php">
-                  <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
-                  <button type="submit" class="btn btn-red btn-sm w-100">
-                    <i class="fa fa-cart-plus"></i> หยิบใส่ตะกร้า
-                  </button>
-                </form>
-              <?php else: ?>
-                <a href="login.php" class="btn btn-outline-secondary btn-sm w-100">
-                  <i class="fa fa-lock"></i> เข้าสู่ระบบเพื่อสั่งซื้อ
+          <!-- SEARCH BAR -->
+          <div class="col-md-6">
+            <div class="header-search">
+              <form method="get">
+                <select name="cat_id" class="input-select">
+                  <option value="">ทุกหมวดหมู่</option>
+                  <?php foreach ($cats as $c): ?>
+                    <option value="<?= $c['cat_id'] ?>" <?= ($cat_id == $c['cat_id']) ? 'selected' : '' ?>>
+                      <?= htmlspecialchars($c['cat_name']) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+                <input class="input" name="search" placeholder="ค้นหาสินค้า..." value="<?= htmlspecialchars($search) ?>">
+                <button class="search-btn">ค้นหา</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- ACCOUNT -->
+          <div class="col-md-3 clearfix">
+            <div class="header-ctn">
+              <div>
+                <a href="wishlist.php">
+                  <i class="fa fa-heart-o"></i>
+                  <span>สินค้าที่ชอบ</span>
                 </a>
-              <?php endif; ?>
+              </div>
+
+              <div>
+                <a href="cart.php">
+                  <i class="fa fa-shopping-cart"></i>
+                  <span>ตะกร้าของฉัน</span>
+                </a>
+              </div>
+
+              <div class="menu-toggle">
+                <a href="#"><i class="fa fa-bars"></i><span>เมนู</span></a>
+              </div>
             </div>
           </div>
         </div>
-      <?php endforeach; ?>
-    <?php else: ?>
-      <p class="text-center text-muted">ไม่พบสินค้าที่ค้นหา</p>
-    <?php endif; ?>
+      </div>
+    </div>
+  </header>
+  <!-- /HEADER -->
+
+  <!-- NAVIGATION -->
+  <nav id="navigation">
+    <div class="container">
+      <div id="responsive-nav">
+        <ul class="main-nav nav navbar-nav">
+          <li class="active"><a href="index.php">หน้าหลัก</a></li>
+          <li><a href="#">โปรโมชั่น</a></li>
+          <?php foreach ($cats as $c): ?>
+            <li><a href="store.php?cat_id=<?= $c['cat_id'] ?>"><?= htmlspecialchars($c['cat_name']) ?></a></li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- /NAVIGATION -->
+
+  <!-- SECTION: PRODUCT LIST -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <?php if ($products): ?>
+          <?php foreach ($products as $p): ?>
+            <div class="col-md-3 col-xs-6">
+              <div class="product">
+                <div class="product-img">
+                  <?php
+                    $imgPath = "../admin/uploads/" . $p['p_image'];
+                    if (!file_exists($imgPath) || empty($p['p_image'])) $imgPath = "img/default.png";
+                  ?>
+                  <img src="<?= $imgPath ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+                  <div class="product-label"><span class="new">NEW</span></div>
+                </div>
+                <div class="product-body">
+                  <p class="product-category"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
+                  <h3 class="product-name">
+                    <a href="product_detail.php?id=<?= $p['p_id'] ?>">
+                      <?= htmlspecialchars($p['p_name']) ?>
+                    </a>
+                  </h3>
+                  <h4 class="product-price"><?= number_format($p['p_price'], 2) ?> บาท</h4>
+                </div>
+                <div class="add-to-cart">
+                  <?php if (isset($_SESSION['customer_id'])): ?>
+                    <form method="post" action="cart_add.php">
+                      <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
+                      <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> หยิบใส่ตะกร้า</button>
+                    </form>
+                  <?php else: ?>
+                    <a href="login.php" class="add-to-cart-btn"><i class="fa fa-sign-in"></i> เข้าสู่ระบบก่อน</a>
+                  <?php endif; ?>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-center text-muted">ไม่พบสินค้า</p>
+        <?php endif; ?>
+      </div>
+    </div>
   </div>
-</div>
 
-<footer>
-  © <?= date('Y') ?> MyCommiss | หน้าร้าน
-</footer>
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="section">
+      <div class="container text-center">
+        <span class="copyright">
+          © <?= date('Y') ?> MyCommiss | Powered by <a href="#">Electro Theme</a>
+        </span>
+      </div>
+    </div>
+  </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-    toastElList.forEach(toastEl => {
-      const toast = new bootstrap.Toast(toastEl, { delay: 5000, autohide: true });
-      toast.show();
-    });
-  });
-</script>
+  <!-- JS -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/slick.min.js"></script>
+  <script src="js/nouislider.min.js"></script>
+  <script src="js/jquery.zoom.min.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
