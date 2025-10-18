@@ -2,335 +2,194 @@
 session_start();
 include "connectdb.php";
 
-// รับค่าค้นหา / หมวดหมู่
-$search = $_GET['search'] ?? '';
-$cat_id = $_GET['cat_id'] ?? '';
-
 // ดึงหมวดหมู่
 $cats = $conn->query("SELECT * FROM category ORDER BY cat_name ASC")->fetchAll(PDO::FETCH_ASSOC);
 
-// ดึงสินค้า
-$sql = "SELECT p.*, c.cat_name 
-        FROM product p 
-        LEFT JOIN category c ON p.cat_id = c.cat_id 
-        WHERE 1";
+// 🔥 สินค้าขายดี Top 10
+$sql_top = "
+  SELECT p.*, c.cat_name 
+  FROM product p
+  LEFT JOIN category c ON p.cat_id = c.cat_id
+  ORDER BY p.sold_qty DESC
+  LIMIT 10";
+$topProducts = $conn->query($sql_top)->fetchAll(PDO::FETCH_ASSOC);
 
-if (!empty($search)) $sql .= " AND p.p_name LIKE :search";
-if (!empty($cat_id)) $sql .= " AND p.cat_id = :cat_id";
-
-$stmt = $conn->prepare($sql);
-if (!empty($search)) $stmt->bindValue(':search', "%$search%");
-if (!empty($cat_id)) $stmt->bindValue(':cat_id', $cat_id);
-$stmt->execute();
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// 🆕 สินค้าใหม่ล่าสุด 10
+$sql_new = "
+  SELECT p.*, c.cat_name 
+  FROM product p
+  LEFT JOIN category c ON p.cat_id = c.cat_id
+  ORDER BY p.created_at DESC
+  LIMIT 10";
+$newProducts = $conn->query($sql_new)->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>MyCommiss | หน้าร้าน</title>
+  <title>MyCommiss | หน้าหลัก</title>
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/slick.css">
-  <link rel="stylesheet" href="css/slick-theme.css">
-  <link rel="stylesheet" href="css/nouislider.min.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <link rel="stylesheet" href="css/style.css">
 
   <style>
-  body { font-family: 'Montserrat', sans-serif; }
+  body { font-family: 'Montserrat', sans-serif; background: #F8F9FA; }
 
-  /* ✅ โลโก้ */
-  .header-logo h3 {
-    font-weight: 800;
-    line-height: 1.3;
-    margin: 0;
-  }
-
-  /* ✅ ช่องค้นหา */
-  .search-box {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border-radius: 30px;
+  /* Banner */
+  .category-banner {
+    position: relative;
     overflow: hidden;
+    border-radius: 10px;
+  }
+  .category-banner img {
     width: 100%;
-    height: 48px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border: 1px solid #e4e7ed;
+    height: 250px;
+    object-fit: cover;
+    transition: 0.4s ease;
   }
-  .input-select {
-    border: none;
-    background: #fff;
-    color: #2B2D42;
-    font-weight: 500;
-    padding: 0 20px;
-    flex: 0 0 180px;
-    font-size: 15px;
-    height: 100%;
-    border-right: 1px solid #E4E7ED;
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 14px;
+  .category-banner:hover img {
+    transform: scale(1.05);
   }
-  .input {
-    border: none;
-    outline: none;
-    background: #fff;
-    padding: 0 18px;
-    flex: 1;
-    font-size: 15px;
-    color: #2B2D42;
-  }
-  .input::placeholder { color: #888; }
-  .search-btn {
-    border: none;
-    background: #D10024;
+  .category-banner .overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(209, 0, 36, 0.85);
+    clip-path: polygon(0 0, 70% 0, 100% 100%, 0 100%);
     color: #fff;
-    font-weight: 600;
-    font-size: 15px;
-    padding: 0 28px;
-    height: 100%;
-    border-radius: 0 30px 30px 0;
-    transition: all 0.2s ease-in-out;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-  }
-  .search-btn:hover {
-    background-color: #a7001c;
-    transform: scale(1.02);
+    padding-left: 30px;
   }
 
-  /* ✅ รูปสินค้า */
+  /* Product */
+  .product { 
+    background: #fff; 
+    border: 1px solid #E4E7ED; 
+    border-radius: 10px; 
+    padding: 15px; 
+    transition: 0.2s; 
+  }
+  .product:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
   .product-img img {
     width: 100%;
     height: 220px;
     object-fit: cover;
     border-radius: 10px;
-    transition: 0.3s ease;
   }
-  .product-img img:hover {
-    transform: scale(1.05);
-  }
-
-  /* ✅ Wishlist / Cart */
-  .header-ctn {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 30px;
-  }
-  .header-ctn a {
-    color: #fff;
-    text-decoration: none;
-    text-align: center;
-  }
-  .header-ctn a:hover span {
-    color: #D10024;
-  }
+  .product-body { text-align: center; }
+  .product-price { color: #D10024; font-weight: 700; }
+  .product-name a { color: #2B2D42; font-weight: 600; text-decoration: none; }
+  .product-name a:hover { color: #D10024; }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header>
-    <div id="top-header">
-      <div class="container">
-        <ul class="header-links pull-left">
-          <li><a href="#"><i class="fa fa-phone"></i> +66 81-234-5678</a></li>
-          <li><a href="#"><i class="fa fa-envelope-o"></i> support@mycommiss.com</a></li>
-          <li><a href="#"><i class="fa fa-map-marker"></i> Bangkok, Thailand</a></li>
-        </ul>
-        <ul class="header-links pull-right">
-          <?php if (isset($_SESSION['customer_id'])): ?>
-            <li><a href="profile.php"><i class="fa fa-user-o"></i> บัญชีของฉัน</a></li>
-            <li><a href="logout.php"><i class="fa fa-sign-out"></i> ออกจากระบบ</a></li>
-          <?php else: ?>
-            <li><a href="login.php"><i class="fa fa-sign-in"></i> เข้าสู่ระบบ</a></li>
-            <li><a href="register.php"><i class="fa fa-user-plus"></i> สมัครสมาชิก</a></li>
-          <?php endif; ?>
-        </ul>
-      </div>
-    </div>
 
-    <div id="header">
-      <div class="container">
-        <div class="row align-items-center">
-          <!-- โลโก้ -->
-          <div class="col-md-3">
-            <div class="header-logo text-center text-md-start">
-              <h3>
-                <b><u><span style="color:#D10024;">MyCommiss</span></u></b><br>
-                <b><u><span style="color:#ffffff;">MyCommiss</span></u></b><br>
-                <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b>
-              </h3>
-            </div>
-          </div>
+<!-- 🔹 HEADER -->
+<header class="py-3 bg-dark text-white text-center">
+  <h2><span style="color:#D10024;">My</span>Commiss Store</h2>
+</header>
 
-          <!-- ช่องค้นหา -->
-          <div class="col-md-6 d-flex justify-content-center align-items-center">
-            <div class="header-search w-100" style="max-width:750px;">
-              <form method="get" class="search-box d-flex">
-                <select name="cat_id" class="input-select">
-                  <option value="">ประเภทสินค้า</option>
-                  <?php foreach ($cats as $c): ?>
-                    <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
-                      <?= htmlspecialchars($c['cat_name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-                <input type="text" name="search" class="input" 
-                       value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
-                <button type="submit" class="search-btn"><i class="fa fa-search"></i> ค้นหา</button>
-              </form>
-            </div>
-          </div>
+<!-- 🔹 NAV -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-white" href="#">หน้าหลัก</a>
+    <ul class="navbar-nav">
+      <li class="nav-item"><a class="nav-link text-white" href="#">โปรโมชั่น</a></li>
+      <li class="nav-item"><a class="nav-link text-white" href="#">หมวดหมู่</a></li>
+    </ul>
+  </div>
+</nav>
 
-          <!-- Wishlist / Cart -->
-          <div class="col-md-3">
-            <div class="header-ctn">
-              <div>
-                <a href="wishlist.php">
-                  <i class="fa fa-heart-o fa-lg"></i><br>
-                  <span>สินค้าที่ชอบ</span>
-                </a>
-              </div>
-              <div>
-                <a href="cart.php">
-                  <i class="fa fa-shopping-cart fa-lg"></i><br>
-                  <span>ตะกร้าของฉัน</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- เมนูหลัก -->
-  <nav id="navigation">
-    <div class="container">
-      <div id="responsive-nav">
-        <ul class="main-nav nav navbar-nav">
-          <li class="active"><a href="index.php">หน้าหลัก</a></li>
-          <li><a href="#">โปรโมชั่น</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-<!-- 🔹 Banner 3 ช่อง (เหมือน Electro) -->
+<!-- 🔹 Banner Section -->
 <div class="container my-5">
   <div class="row g-4">
     <div class="col-md-4">
-      <div class="category-banner position-relative overflow-hidden rounded">
-        <img src="img/laptop.jpg" class="img-fluid" alt="Laptop">
-        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center px-4"
-             style="background: rgba(209,0,36,0.85); clip-path: polygon(0 0, 70% 0, 100% 100%, 0 100%); color:white;">
-          <h4 class="fw-bold">Laptop Collection</h4>
-          <a href="store.php?cat_id=1" class="text-white text-decoration-none">
-            SHOP NOW <i class="fa fa-arrow-circle-o-right"></i>
-          </a>
+      <div class="category-banner">
+        <img src="img/laptop.jpg" alt="Laptop">
+        <div class="overlay">
+          <h4>Laptop Collection</h4>
+          <a href="store.php?cat_id=1" class="text-white text-decoration-none">SHOP NOW <i class="fa fa-arrow-circle-o-right"></i></a>
         </div>
       </div>
     </div>
-
     <div class="col-md-4">
-      <div class="category-banner position-relative overflow-hidden rounded">
-        <img src="img/headphone.jpg" class="img-fluid" alt="Accessories">
-        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center px-4"
-             style="background: rgba(209,0,36,0.85); clip-path: polygon(0 0, 70% 0, 100% 100%, 0 100%); color:white;">
-          <h4 class="fw-bold">Accessories Collection</h4>
-          <a href="store.php?cat_id=2" class="text-white text-decoration-none">
-            SHOP NOW <i class="fa fa-arrow-circle-o-right"></i>
-          </a>
+      <div class="category-banner">
+        <img src="img/headphone.jpg" alt="Accessories">
+        <div class="overlay">
+          <h4>Accessories Collection</h4>
+          <a href="store.php?cat_id=2" class="text-white text-decoration-none">SHOP NOW <i class="fa fa-arrow-circle-o-right"></i></a>
         </div>
       </div>
     </div>
-
     <div class="col-md-4">
-      <div class="category-banner position-relative overflow-hidden rounded">
-        <img src="img/camera.jpg" class="img-fluid" alt="Camera">
-        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center px-4"
-             style="background: rgba(209,0,36,0.85); clip-path: polygon(0 0, 70% 0, 100% 100%, 0 100%); color:white;">
-          <h4 class="fw-bold">Cameras Collection</h4>
-          <a href="store.php?cat_id=3" class="text-white text-decoration-none">
-            SHOP NOW <i class="fa fa-arrow-circle-o-right"></i>
-          </a>
+      <div class="category-banner">
+        <img src="img/camera.jpg" alt="Cameras">
+        <div class="overlay">
+          <h4>Cameras Collection</h4>
+          <a href="store.php?cat_id=3" class="text-white text-decoration-none">SHOP NOW <i class="fa fa-arrow-circle-o-right"></i></a>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<?php
-// 🔥 สินค้าขายดี Top 10
-$topProducts = $conn->query("
-  SELECT p.*, c.cat_name 
-  FROM product p
-  LEFT JOIN category c ON p.cat_id = c.cat_id
-  ORDER BY p.sold_qty DESC
-  LIMIT 10
-")->fetchAll(PDO::FETCH_ASSOC);
-
-// 🆕 สินค้าใหม่ล่าสุด 10
-$newProducts = $conn->query("
-  SELECT p.*, c.cat_name 
-  FROM product p
-  LEFT JOIN category c ON p.cat_id = c.cat_id
-  ORDER BY p.created_at DESC
-  LIMIT 10
-")->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<!-- 🔥 สินค้าขายดี Top 10 -->
+<!-- 🔥 Top Selling -->
 <div class="container mb-5">
-  <h3 class="text-center text-danger mb-4"><i class="fa fa-fire"></i> สินค้าขายดี Top 10</h3>
+  <h3 class="mb-4 text-center text-danger"><i class="fa fa-fire"></i> สินค้าขายดี Top 10</h3>
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($topProducts as $p): ?>
       <div class="col">
-        <div class="product text-center">
+        <div class="product">
           <?php
             $uploadPath = "admin/uploads/";
             $imgFile = $p['p_image'];
-            $imgPath = (!empty($imgFile) && file_exists($uploadPath.$imgFile)) ? $uploadPath.$imgFile : "img/default.png";
+            $imgPath = (!empty($imgFile) && file_exists($uploadPath.$imgFile)) ? 
+              $uploadPath.$imgFile : "img/default.png";
           ?>
-          <div class="product-img mb-2">
-            <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
+          <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" class="product-img">
+          <div class="product-body mt-2">
+            <p class="text-muted small"><?= htmlspecialchars($p['cat_name']) ?></p>
+            <h5 class="product-name"><a href="product_detail.php?id=<?= $p['p_id'] ?>"><?= htmlspecialchars($p['p_name']) ?></a></h5>
+            <p class="product-price"><?= number_format($p['p_price'],2) ?> บาท</p>
           </div>
-          <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name']) ?></p>
-          <h6 class="fw-semibold"><a href="product_detail.php?id=<?= $p['p_id'] ?>" class="text-dark text-decoration-none"><?= htmlspecialchars($p['p_name']) ?></a></h6>
-          <p class="text-danger fw-bold"><?= number_format($p['p_price'],2) ?> บาท</p>
         </div>
       </div>
     <?php endforeach; ?>
   </div>
 </div>
 
-<!-- 🆕 สินค้ามาใหม่ 10 รายการ -->
+<!-- 🆕 New Arrivals -->
 <div class="container mb-5">
-  <h3 class="text-center text-danger mb-4"><i class="fa fa-star"></i> สินค้ามาใหม่</h3>
+  <h3 class="mb-4 text-center text-danger"><i class="fa fa-star"></i> สินค้ามาใหม่ 10 รายการ</h3>
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($newProducts as $p): ?>
       <div class="col">
-        <div class="product text-center">
+        <div class="product">
           <?php
             $uploadPath = "admin/uploads/";
             $imgFile = $p['p_image'];
-            $imgPath = (!empty($imgFile) && file_exists($uploadPath.$imgFile)) ? $uploadPath.$imgFile : "img/default.png";
+            $imgPath = (!empty($imgFile) && file_exists($uploadPath.$imgFile)) ? 
+              $uploadPath.$imgFile : "img/default.png";
           ?>
-          <div class="product-img mb-2">
-            <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
+          <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" class="product-img">
+          <div class="product-body mt-2">
+            <p class="text-muted small"><?= htmlspecialchars($p['cat_name']) ?></p>
+            <h5 class="product-name"><a href="product_detail.php?id=<?= $p['p_id'] ?>"><?= htmlspecialchars($p['p_name']) ?></a></h5>
+            <p class="product-price"><?= number_format($p['p_price'],2) ?> บาท</p>
           </div>
-          <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name']) ?></p>
-          <h6 class="fw-semibold"><a href="product_detail.php?id=<?= $p['p_id'] ?>" class="text-dark text-decoration-none"><?= htmlspecialchars($p['p_name']) ?></a></h6>
-          <p class="text-danger fw-bold"><?= number_format($p['p_price'],2) ?> บาท</p>
         </div>
       </div>
     <?php endforeach; ?>
   </div>
 </div>
+
+<!-- 🔹 FOOTER -->
+<footer class="bg-dark text-center text-white py-3">
+  © <?= date('Y') ?> MyCommiss | Powered by Electro Theme
+</footer>
+
+</body>
 </html>
