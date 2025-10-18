@@ -222,12 +222,12 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </nav>
 <?php
-// เปิดแสดง error (ใช้ได้ทั้งบน Cloud)
+// เปิดแสดง error ให้ดูถ้ามีปัญหา
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-// 🔥 ดึงสินค้าขายดี Top 10 (จำลองจาก stock เหลือน้อย)
+// 🔥 ดึงสินค้าขายดี Top 10 (จำลองจาก stock เหลือน้อยสุด)
 try {
   $topProducts = $conn->query("
     SELECT p.*, c.cat_name 
@@ -263,22 +263,26 @@ try {
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($topProducts as $p): ?>
       <?php
-        $imgFile = $p['p_image'];
-        $uploadPath = __DIR__ . "/../admin/uploads/" . $imgFile;
-        $imgUrl = "../admin/uploads/" . $imgFile;
-        $imgPath = (file_exists($uploadPath) && !empty($imgFile)) ? $imgUrl : "img/default.png";
+        $imgFile = trim($p['p_image']);
+        // ✅ URL เต็มของไฟล์บน Cloud
+        $imgUrl = "http://212.80.215.29/test/admin/uploads/" . $imgFile;
+        $uploadPath = "/var/www/html/test/admin/uploads/" . $imgFile;
+
+        // ✅ ถ้าไม่มีไฟล์จริง ให้ใช้ default.png
+        if (empty($imgFile) || !file_exists($uploadPath)) {
+          $imgUrl = "img/default.png";
+        }
       ?>
       <div class="col">
         <div class="product text-center p-3 border rounded shadow-sm bg-white">
           <div class="product-img mb-2">
-            <img src="<?= htmlspecialchars($imgPath) ?>" 
+            <img src="<?= htmlspecialchars($imgUrl) ?>" 
                  alt="<?= htmlspecialchars($p['p_name']) ?>" 
                  style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
           </div>
           <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
           <h6 class="fw-semibold">
-            <a href="product_detail.php?id=<?= $p['p_id'] ?>" 
-               class="text-dark text-decoration-none">
+            <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="text-dark text-decoration-none">
               <?= htmlspecialchars($p['p_name']) ?>
             </a>
           </h6>
@@ -302,22 +306,24 @@ try {
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($newProducts as $p): ?>
       <?php
-        $imgFile = $p['p_image'];
-        $uploadPath = __DIR__ . "/../admin/uploads/" . $imgFile;
-        $imgUrl = "../admin/uploads/" . $imgFile;
-        $imgPath = (file_exists($uploadPath) && !empty($imgFile)) ? $imgUrl : "img/default.png";
+        $imgFile = trim($p['p_image']);
+        $imgUrl = "http://212.80.215.29/test/admin/uploads/" . $imgFile;
+        $uploadPath = "/var/www/html/test/admin/uploads/" . $imgFile;
+
+        if (empty($imgFile) || !file_exists($uploadPath)) {
+          $imgUrl = "img/default.png";
+        }
       ?>
       <div class="col">
         <div class="product text-center p-3 border rounded shadow-sm bg-white">
           <div class="product-img mb-2">
-            <img src="<?= htmlspecialchars($imgPath) ?>" 
+            <img src="<?= htmlspecialchars($imgUrl) ?>" 
                  alt="<?= htmlspecialchars($p['p_name']) ?>" 
                  style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
           </div>
           <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
           <h6 class="fw-semibold">
-            <a href="product_detail.php?id=<?= $p['p_id'] ?>" 
-               class="text-dark text-decoration-none">
+            <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="text-dark text-decoration-none">
               <?= htmlspecialchars($p['p_name']) ?>
             </a>
           </h6>
@@ -328,6 +334,7 @@ try {
   </div>
   <?php endif; ?>
 </div>
+
 
 
   <footer id="footer">
