@@ -121,20 +121,19 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <!-- /HEADER -->
 
   <!-- NAVIGATION -->
-  <nav id="navigation">
-    <div class="container">
-      <div id="responsive-nav">
-        <ul class="main-nav nav navbar-nav">
-          <li class="active"><a href="index.php">หน้าหลัก</a></li>
-          <li><a href="#">โปรโมชั่น</a></li>
-          <?php foreach ($cats as $c): ?>
-            <li><a href="store.php?cat_id=<?= $c['cat_id'] ?>"><?= htmlspecialchars($c['cat_name']) ?></a></li>
-          <?php endforeach; ?>
-        </ul>
-      </div>
+<nav id="navigation">
+  <div class="container">
+    <div id="responsive-nav">
+      <ul class="main-nav nav navbar-nav">
+        <li class="active"><a href="index.php">หน้าหลัก</a></li>
+        <li><a href="#">โปรโมชั่น</a></li>
+     
+      </ul>
     </div>
-  </nav>
-  <!-- /NAVIGATION -->
+  </div>
+</nav>
+<!-- /NAVIGATION -->
+
 
   <!-- SECTION: PRODUCT LIST -->
   <div class="section">
@@ -186,7 +185,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="section">
       <div class="container text-center">
         <span class="copyright">
-          © <?= date('Y') ?> MyCommiss | Powered by <a href="#">Electro Theme</a>
+          © <?= date('Y') ?> MyCommiss | หน้าเเรก <a href="#">Electro Theme</a>
         </span>
       </div>
     </div>
