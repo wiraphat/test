@@ -211,49 +211,88 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </header>
 
   <!-- 🛍 แสดงสินค้า -->
-  <div class="row row-cols-1 row-cols-md-4 g-4">
-    <?php if (count($products) > 0): ?>
+  <?php
+include("connectdb.php");
+
+// ดึงข้อมูลสินค้า
+$sql = "SELECT p.*, c.cat_name 
+        FROM product p 
+        LEFT JOIN category c ON p.cat_id = c.cat_id 
+        ORDER BY p_id DESC";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<!-- 🔹 Section: สินค้าใหม่ -->
+<div class="section">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12 text-center">
+        <h3 class="fw-bold text-uppercase text-dark">🆕 สินค้าใหม่ล่าสุด</h3>
+        <p class="text-muted">เลือกซื้อสินค้า IT คุณภาพ ราคาคุ้มค่า จาก MyCommiss</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
       <?php foreach ($products as $p): ?>
-        <?php
-          $imagePath = "../admin/uploads/" . $p['p_image'];
-          if (!file_exists($imagePath) || empty($p['p_image'])) {
-            $imagePath = "img/default.png"; // ใช้ภาพสำรอง
-          }
-        ?>
-        <div class="col">
-          <div class="card h-100 shadow-sm border-0">
-            <img src="<?= $imagePath ?>" class="card-img-top" style="height:200px;object-fit:cover;">
-            <div class="card-body">
-              <h6 class="card-title text-truncate" title="<?= htmlspecialchars($p['p_name']) ?>">
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="card h-100 shadow-sm border-0 rounded-4">
+            <div class="position-relative">
+              <?php 
+                $imgPath = !empty($p['p_image']) ? "admin/uploads/" . $p['p_image'] : "img/default.png";
+              ?>
+              <img src="<?= htmlspecialchars($imgPath) ?>" 
+                   class="card-img-top rounded-top-4" 
+                   style="height:220px;object-fit:cover;" 
+                   alt="<?= htmlspecialchars($p['p_name']) ?>">
+
+              <span class="position-absolute top-0 end-0 bg-danger text-white small px-2 py-1 rounded-start">
+                <?= htmlspecialchars($p['cat_name']) ?>
+              </span>
+            </div>
+
+            <div class="card-body text-center">
+              <h6 class="fw-semibold text-dark" style="min-height:45px;">
                 <?= htmlspecialchars($p['p_name']) ?>
               </h6>
-              <p class="text-muted mb-2"><?= number_format($p['p_price'], 2) ?> บาท</p>
-              <a href="product_detail.php?id=<?= $p['p_id'] ?>" 
-                 class="btn btn-sm btn-outline-primary w-100">
-                ดูรายละเอียด
-              </a>
+              <p class="text-danger fw-bold fs-6 mb-2">
+                <?= number_format($p['p_price'], 2) ?> บาท
+              </p>
+            </div>
 
-              <?php if (isset($_SESSION['customer_id'])): ?>
-                <!-- ✅ ถ้าล็อกอินแล้ว แสดงปุ่มซื้อ -->
-                <form method="post" action="cart_add.php" class="mt-2">
-                  <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
-                  <button type="submit" class="btn btn-success btn-sm w-100">🛒 หยิบใส่ตะกร้า</button>
-                </form>
-              <?php else: ?>
-                <!-- 🚫 ถ้ายังไม่ล็อกอิน -->
-                <a href="login.php" class="btn btn-outline-secondary btn-sm w-100 mt-2">
-                  🔑 เข้าสู่ระบบเพื่อสั่งซื้อ
-                </a>
-              <?php endif; ?>
+            <div class="card-footer bg-white border-0 text-center pb-3">
+              <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-outline-dark btn-sm">
+                🔍 ดูรายละเอียด
+              </a>
+              <form action="add_to_cart.php" method="post" class="d-inline">
+                <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
+                <button type="submit" class="btn btn-success btn-sm">
+                  🛒 เพิ่มในตะกร้า
+                </button>
+              </form>
             </div>
           </div>
         </div>
       <?php endforeach; ?>
-    <?php else: ?>
-      <p class="text-center text-muted">ไม่พบสินค้าที่ค้นหา</p>
-    <?php endif; ?>
+    </div>
   </div>
 </div>
+
+<!-- 💅 CSS เพิ่มความสวย -->
+<style>
+.card:hover {
+  transform: translateY(-5px);
+  transition: 0.3s;
+}
+.card img {
+  transition: transform 0.3s ease-in-out;
+}
+.card:hover img {
+  transform: scale(1.05);
+}
+</style>
+d
 	
 
 		<!-- FOOTER -->
