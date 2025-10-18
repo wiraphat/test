@@ -293,45 +293,93 @@ try {
   <?php endif; ?>
 </div>
 
-<!-- 🆕 สินค้าใหม่ล่าสุด 10 -->
-<div class="container my-5">
-  <h3 class="text-center text-primary fw-bold mb-4">
-    <i class="fa fa-star"></i> สินค้ามาใหม่ล่าสุด
-  </h3>
-
-  <?php if (empty($newProducts)): ?>
-    <p class="text-center text-muted">ยังไม่มีสินค้าใหม่</p>
-  <?php else: ?>
-  <div class="row row-cols-1 row-cols-md-5 g-4">
-    <?php foreach ($newProducts as $p): ?>
-      <?php
-        $imgFile = trim($p['p_image']);
-        $imgUrl = "http://212.80.215.29/test/admin/uploads/" . $imgFile;
-        if (empty($imgFile)) {
-          $imgUrl = "img/default.png";
-        }
-      ?>
-      <div class="col">
-        <div class="product text-center p-3 border rounded shadow-sm bg-white">
-          <div class="product-img mb-2">
-            <img src="<?= htmlspecialchars($imgUrl) ?>" 
-                 alt="<?= htmlspecialchars($p['p_name']) ?>" 
-                 onerror="this.src='img/default.png';"
-                 style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
+<!-- 🆕 สินค้าใหม่ล่าสุดแบบ Electro Carousel -->
+<div class="section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="section-title">
+          <h3 class="title">สินค้าใหม่ล่าสุด</h3>
+          <div class="section-nav">
+            <ul class="section-tab-nav tab-nav">
+              <li class="active"><a data-toggle="tab" href="#tab1">ทั้งหมด</a></li>
+              <?php foreach ($cats as $c): ?>
+                <li><a href="index.php?cat_id=<?= $c['cat_id'] ?>"><?= htmlspecialchars($c['cat_name']) ?></a></li>
+              <?php endforeach; ?>
+            </ul>
           </div>
-          <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
-          <h6 class="fw-semibold">
-            <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="text-dark text-decoration-none">
-              <?= htmlspecialchars($p['p_name']) ?>
-            </a>
-          </h6>
-          <p class="text-danger fw-bold mb-0"><?= number_format($p['p_price'], 2) ?> บาท</p>
         </div>
       </div>
-    <?php endforeach; ?>
+
+      <div class="col-md-12">
+        <div class="row">
+          <div class="products-tabs">
+            <!-- tab -->
+            <div id="tab1" class="tab-pane active">
+              <div class="products-slick" data-nav="#slick-nav-1">
+                <?php foreach ($newProducts as $p): ?>
+                  <?php
+                    $imgFile = trim($p['p_image']);
+                    $imgUrl = "http://212.80.215.29/test/admin/uploads/" . $imgFile;
+                    if (empty($imgFile)) $imgUrl = "img/default.png";
+                  ?>
+                  <!-- product -->
+                  <div class="product">
+                    <div class="product-img">
+                      <img src="<?= htmlspecialchars($imgUrl) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" onerror="this.src='img/default.png';">
+                      <div class="product-label">
+                        <span class="sale">NEW</span>
+                      </div>
+                    </div>
+                    <div class="product-body">
+                      <p class="product-category"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
+                      <h3 class="product-name">
+                        <a href="product_detail.php?id=<?= $p['p_id'] ?>">
+                          <?= htmlspecialchars($p['p_name']) ?>
+                        </a>
+                      </h3>
+                      <h4 class="product-price">
+                        ฿<?= number_format($p['p_price'], 2) ?>
+                      </h4>
+                      <div class="product-rating">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star-o"></i>
+                      </div>
+                      <div class="product-btns">
+                        <button class="add-to-wishlist"><i class="fa fa-heart-o"></i></button>
+                        <button class="add-to-compare"><i class="fa fa-exchange"></i></button>
+                        <button class="quick-view"><i class="fa fa-eye"></i></button>
+                      </div>
+                    </div>
+                    <div class="add-to-cart">
+                      <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> เพิ่มในตะกร้า</button>
+                    </div>
+                  </div>
+                  <!-- /product -->
+                <?php endforeach; ?>
+              </div>
+              <div id="slick-nav-1" class="products-slick-nav"></div>
+            </div>
+            <!-- /tab -->
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <?php endif; ?>
 </div>
+
+<!-- ✅ ต้องแน่ใจว่ามีไฟล์เหล่านี้ -->
+<!-- (จาก Electro theme เดิม) -->
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/slick.min.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/jquery.zoom.min.js"></script>
+<script src="js/main.js"></script>
+
 
 
 
