@@ -954,15 +954,21 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		</div>
 	
 						
-							
+						<!-- ✅ Footer -->
+<footer>
+  © <?= date('Y') ?> MyCommiss | เข้าสู่ระบบ
+</footer>
 
-		<!-- jQuery Plugins -->
-		<script src="js/jquery.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/slick.min.js"></script>
-		<script src="js/nouislider.min.js"></script>
-		<script src="js/jquery.zoom.min.js"></script>
-		<script src="js/main.js"></script>
-
-	</body>
-</html>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script>
+  // ✅ Toast auto-hide
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.toast').forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
+      toast.show();
+    });
+  });
+</script>
+</body>
+</html>	
