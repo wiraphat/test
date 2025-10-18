@@ -11,86 +11,96 @@
   <link rel="stylesheet" href="css/nouislider.min.css">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    body {
-      background: #F6F7F8;
-      font-family: 'Montserrat', sans-serif;
-    }
+  body {
+    background: #F6F7F8;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;              /* ✅ ทำให้สูงเท่าจอ */
+    display: flex;
+    flex-direction: column;         /* ✅ จัดแนวตั้ง */
+  }
 
-    .login-wrapper {
-      background: #FFF;
-      border: 1px solid #E4E7ED;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      padding: 40px 45px;
-      max-width: 420px;
-      margin: 80px auto;
-      transition: 0.3s;
-    }
+  /* กล่อง login */
+  .login-wrapper {
+    background: #FFF;
+    border: 1px solid #E4E7ED;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    padding: 40px 45px;
+    max-width: 420px;
+    margin: 60px auto;
+    flex-grow: 1;                   /* ✅ ดัน footer ลงล่าง */
+    transition: 0.3s;
+  }
 
-    .login-wrapper:hover {
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-      transform: translateY(-2px);
-    }
+  .login-wrapper:hover {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+  }
 
-    .login-title {
-      text-align: center;
-      color: #2B2D42;
-      font-weight: 700;
-      font-size: 1.4rem;
-      margin-bottom: 25px;
-    }
+  /* หัวข้อ */
+  .login-title {
+    text-align: center;
+    color: #2B2D42;
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 25px;
+  }
 
-    .login-title i {
-      color: #D10024;
-      margin-right: 6px;
-    }
+  .login-title i {
+    color: #D10024;
+    margin-right: 6px;
+  }
 
-    .input {
-      border-radius: 40px;
-      border: 1px solid #E4E7ED;
-      padding: 10px 18px;
-      transition: 0.2s;
-    }
-    .input:focus {
-      border-color: #D10024;
-      box-shadow: 0 0 0 3px rgba(209,0,36,0.15);
-      outline: none;
-    }
+  /* ช่อง input */
+  .input {
+    border-radius: 40px;
+    border: 1px solid #E4E7ED;
+    padding: 10px 18px;
+    transition: 0.2s;
+  }
+  .input:focus {
+    border-color: #D10024;
+    box-shadow: 0 0 0 3px rgba(209,0,36,0.15);
+    outline: none;
+  }
 
-    .primary-btn {
-      background-color: #D10024;
-      color: #fff;
-      border-radius: 40px;
-      width: 100%;
-      font-weight: 600;
-      text-transform: uppercase;
-      transition: 0.3s;
-      padding: 12px;
-      margin-top: 10px;
-    }
-    .primary-btn:hover {
-      background-color: #a5001a;
-    }
+  /* ปุ่มหลัก */
+  .primary-btn {
+    background-color: #D10024;
+    color: #fff;
+    border-radius: 40px;
+    width: 100%;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: 0.3s;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .primary-btn:hover {
+    background-color: #a5001a;
+  }
 
-    .text-link {
-      color: #D10024;
-      text-decoration: none;
-      font-weight: 500;
-    }
+  .text-link {
+    color: #D10024;
+    text-decoration: none;
+    font-weight: 500;
+  }
 
-    .text-link:hover {
-      text-decoration: underline;
-    }
+  .text-link:hover {
+    text-decoration: underline;
+  }
 
-    footer {
-      background: #15161D;
-      padding: 20px;
-      color: #fff;
-      text-align: center;
-      margin-top: 80px;
-      font-size: 0.9rem;
-    }
-  </style>
+  /* ✅ Footer ติดขอบล่าง */
+  footer {
+    background: #15161D;
+    padding: 20px;
+    color: #fff;
+    text-align: center;
+    margin-top: auto;               /* ✅ บังคับชิดขอบล่าง */
+    font-size: 0.9rem;
+  }
+</style>
+
 </head>
 <body>
 
@@ -112,7 +122,7 @@
   <form method="post" action="login_process.php">
     <div class="mb-3">
       <input type="email" name="email" class="input w-100" placeholder="Email" required>
-    </div>
+    </div><br>
     <div class="mb-3">
       <input type="password" name="password" class="input w-100" placeholder="Password" required>
     </div>
