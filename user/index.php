@@ -222,72 +222,115 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </nav>
 
-  <!-- สินค้า -->
-  <div class="section">
-    <div class="container">
-      <div class="row">
-        <?php if ($products): ?>
-          <?php foreach ($products as $p): ?>
-            <div class="col-md-3 col-xs-6">
-              <div class="product">
-                <div class="product-img">
-                  <?php
-                    // ✅ ตรวจสอบ path รูปภาพอัตโนมัติ
-                    $uploadPath = "admin/uploads/"; // ← เปลี่ยนตามโฟลเดอร์จริงถ้าต่าง
-                    $imgFile = $p['p_image'];
-                    if (!empty($imgFile) && file_exists($uploadPath . $imgFile)) {
-                      $imgPath = $uploadPath . $imgFile;
-                    } else {
-                      $imgPath = "img/default.png";
-                    }
-                  ?>
-                  <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-                  <div class="product-label"><span class="new">NEW</span></div>
-                </div>
-                <div class="product-body">
-                  <p class="product-category"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
-                  <h3 class="product-name">
-                    <a href="product_detail.php?id=<?= $p['p_id'] ?>">
-                      <?= htmlspecialchars($p['p_name']) ?>
-                    </a>
-                  </h3>
-                  <h4 class="product-price"><?= number_format($p['p_price'], 2) ?> บาท</h4>
-                </div>
-                <div class="add-to-cart">
-                  <?php if (isset($_SESSION['customer_id'])): ?>
-                    <form method="post" action="cart_add.php">
-                      <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
-                      <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> หยิบใส่ตะกร้า</button>
-                    </form>
-                  <?php else: ?>
-                    <a href="login.php" class="add-to-cart-btn"><i class="fa fa-sign-in"></i> เข้าสู่ระบบก่อน</a>
-                  <?php endif; ?>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <p class="text-center text-muted">ไม่พบสินค้า</p>
-        <?php endif; ?>
+<!-- 🔹 Banner 3 ช่อง (เหมือน Electro) -->
+<div class="container my-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="category-banner position-relative overflow-hidden rounded">
+        <img src="img/laptop.jpg" class="img-fluid" alt="Laptop">
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center px-4"
+             style="background: rgba(209,0,36,0.85); clip-path: polygon(0 0, 70% 0, 100% 100%, 0 100%); color:white;">
+          <h4 class="fw-bold">Laptop Collection</h4>
+          <a href="store.php?cat_id=1" class="text-white text-decoration-none">
+            SHOP NOW <i class="fa fa-arrow-circle-o-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="category-banner position-relative overflow-hidden rounded">
+        <img src="img/headphone.jpg" class="img-fluid" alt="Accessories">
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center px-4"
+             style="background: rgba(209,0,36,0.85); clip-path: polygon(0 0, 70% 0, 100% 100%, 0 100%); color:white;">
+          <h4 class="fw-bold">Accessories Collection</h4>
+          <a href="store.php?cat_id=2" class="text-white text-decoration-none">
+            SHOP NOW <i class="fa fa-arrow-circle-o-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="category-banner position-relative overflow-hidden rounded">
+        <img src="img/camera.jpg" class="img-fluid" alt="Camera">
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center px-4"
+             style="background: rgba(209,0,36,0.85); clip-path: polygon(0 0, 70% 0, 100% 100%, 0 100%); color:white;">
+          <h4 class="fw-bold">Cameras Collection</h4>
+          <a href="store.php?cat_id=3" class="text-white text-decoration-none">
+            SHOP NOW <i class="fa fa-arrow-circle-o-right"></i>
+          </a>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <footer id="footer">
-    <div class="section">
-      <div class="container text-center">
-        <span class="copyright">
-          © <?= date('Y') ?> MyCommiss | หน้าแรก <a href="#">Electro Theme</a>
-        </span>
+<?php
+// 🔥 สินค้าขายดี Top 10
+$topProducts = $conn->query("
+  SELECT p.*, c.cat_name 
+  FROM product p
+  LEFT JOIN category c ON p.cat_id = c.cat_id
+  ORDER BY p.sold_qty DESC
+  LIMIT 10
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// 🆕 สินค้าใหม่ล่าสุด 10
+$newProducts = $conn->query("
+  SELECT p.*, c.cat_name 
+  FROM product p
+  LEFT JOIN category c ON p.cat_id = c.cat_id
+  ORDER BY p.created_at DESC
+  LIMIT 10
+")->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<!-- 🔥 สินค้าขายดี Top 10 -->
+<div class="container mb-5">
+  <h3 class="text-center text-danger mb-4"><i class="fa fa-fire"></i> สินค้าขายดี Top 10</h3>
+  <div class="row row-cols-1 row-cols-md-5 g-4">
+    <?php foreach ($topProducts as $p): ?>
+      <div class="col">
+        <div class="product text-center">
+          <?php
+            $uploadPath = "admin/uploads/";
+            $imgFile = $p['p_image'];
+            $imgPath = (!empty($imgFile) && file_exists($uploadPath.$imgFile)) ? $uploadPath.$imgFile : "img/default.png";
+          ?>
+          <div class="product-img mb-2">
+            <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
+          </div>
+          <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name']) ?></p>
+          <h6 class="fw-semibold"><a href="product_detail.php?id=<?= $p['p_id'] ?>" class="text-dark text-decoration-none"><?= htmlspecialchars($p['p_name']) ?></a></h6>
+          <p class="text-danger fw-bold"><?= number_format($p['p_price'],2) ?> บาท</p>
+        </div>
       </div>
-    </div>
-  </footer>
+    <?php endforeach; ?>
+  </div>
+</div>
 
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/slick.min.js"></script>
-  <script src="js/nouislider.min.js"></script>
-  <script src="js/jquery.zoom.min.js"></script>
-  <script src="js/main.js"></script>
-</body>
+<!-- 🆕 สินค้ามาใหม่ 10 รายการ -->
+<div class="container mb-5">
+  <h3 class="text-center text-danger mb-4"><i class="fa fa-star"></i> สินค้ามาใหม่</h3>
+  <div class="row row-cols-1 row-cols-md-5 g-4">
+    <?php foreach ($newProducts as $p): ?>
+      <div class="col">
+        <div class="product text-center">
+          <?php
+            $uploadPath = "admin/uploads/";
+            $imgFile = $p['p_image'];
+            $imgPath = (!empty($imgFile) && file_exists($uploadPath.$imgFile)) ? $uploadPath.$imgFile : "img/default.png";
+          ?>
+          <div class="product-img mb-2">
+            <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
+          </div>
+          <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name']) ?></p>
+          <h6 class="fw-semibold"><a href="product_detail.php?id=<?= $p['p_id'] ?>" class="text-dark text-decoration-none"><?= htmlspecialchars($p['p_name']) ?></a></h6>
+          <p class="text-danger fw-bold"><?= number_format($p['p_price'],2) ?> บาท</p>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</div>
 </html>
