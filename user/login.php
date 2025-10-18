@@ -28,7 +28,7 @@
     padding: 40px 45px;
     max-width: 420px;
     margin: 60px auto;
-    flex-grow: 1;                   /* ✅ ดัน footer ลงล่าง */
+    flex-grow: 1;
     transition: 0.3s;
   }
 
