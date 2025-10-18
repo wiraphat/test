@@ -63,6 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
+    <?php include("navbar_user.php"); ?>
+
     body {
       background: #F6F7F8;
       font-family: 'Montserrat', sans-serif;
