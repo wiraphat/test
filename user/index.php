@@ -251,9 +251,48 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /* 🔍 ช่องค้นหา */
+/* 🎯 ช่องค้นหาดีไซน์ Electro สีพื้นขาวเท่ากันทั้งแถบ */
+.header-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-search form {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 720px;
+  background: #ffffff; /* ✅ พื้นขาวเท่ากันทั้งแถบ */
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  overflow: hidden; /* ✅ ให้ขอบโค้งตัดเรียบ */
+}
+
+/* 🔻 ประเภทสินค้า */
+.header-search .input-select {
+  border: none;
+  padding: 0 18px;
+  height: 48px;
+  background: #ffffff; /* ✅ สีขาวตรงกับ input */
+  flex: 0 0 180px;
+  font-size: 15px;
+  color: #2B2D42;
+  font-weight: 500;
+  border-radius: 30px 0 0 30px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 14px;
+}
+
+/* 🔍 ช่องค้นหา */
 .header-search .input {
   border: none;
-  background: #fff;
+  background: #ffffff; /* ✅ สีเดียวกับ select */
   padding: 0 18px;
   height: 48px;
   flex: 1;
@@ -268,7 +307,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 /* 🔴 ปุ่มค้นหา */
 .header-search .search-btn {
   border: none;
-  background-color: #D10024;
+  background-color: #D10024; /* ✅ สีแดงหลัก Electro */
   color: #fff;
   font-weight: 600;
   height: 48px;
@@ -279,8 +318,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease-in-out;
-  position: relative;
-  z-index: 2; /* ✅ ดันปุ่มขึ้นมาครอบขอบขาว */
 }
 .header-search .search-btn i {
   margin-right: 6px;
@@ -289,6 +326,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   background-color: #a7001c;
   transform: translateY(-1px);
 }
+
 
 </style>
 
