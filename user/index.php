@@ -953,22 +953,33 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			<!-- /container -->
 		</div>
 	
-						
-						<!-- ✅ Footer -->
-<footer>
-  © <?= date('Y') ?> MyCommiss | เข้าสู่ระบบ
-</footer>
 
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script>
-  // ✅ Toast auto-hide
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.toast').forEach(toastEl => {
-      const toast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
-      toast.show();
-    });
-  });
-</script>
-</body>
-</html>	
+		<!-- FOOTER -->
+		<footer id="footer">
+			<!-- top footer -->
+			<div class="section">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">About Us</h3>
+								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.</p>
+		
+							</div>
+						</div>
+
+						
+							
+
+		<!-- jQuery Plugins -->
+		<script src="js/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/slick.min.js"></script>
+		<script src="js/nouislider.min.js"></script>
+		<script src="js/jquery.zoom.min.js"></script>
+		<script src="js/main.js"></script>
+
+	</body>
+</html>
