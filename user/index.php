@@ -147,25 +147,68 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
           </div>
 
-         
           <!-- 🟦 ช่องค้นหา -->
 <div class="col-md-6 d-flex justify-content-center align-items-center">
-  <div class="header-search w-100" style="max-width:600px;">
+  <div class="header-search w-100" style="max-width:700px;">
     <form method="get" class="d-flex w-100">
       <select name="cat_id" class="input-select">
-        <option value="">ทุกหมวดหมู่</option>
+        <option value="">ประเภทสินค้า</option>
         <?php foreach ($cats as $c): ?>
           <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
             <?= htmlspecialchars($c['cat_name']) ?>
           </option>
         <?php endforeach; ?>
       </select>
+
       <input type="text" name="search" class="input" value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
+
       <button type="submit" class="search-btn">ค้นหา</button>
-      
     </form>
   </div>
 </div>
+
+<style>
+/* ✅ ให้ dropdown + ช่องค้นหา + ปุ่มติดกัน */
+.header-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.header-search form {
+  display: flex;
+  width: 100%;
+}
+.header-search .input-select {
+  border: 1px solid #E4E7ED;
+  border-right: none; /* ❌ เอาขอบขวาออกให้ติดกับ input */
+  border-radius: 30px 0 0 30px; /* ✅ โค้งด้านซ้าย */
+  padding: 10px 15px;
+  height: 44px;
+  background: #fff;
+  flex: 0 0 170px; /* ✅ กำหนดความกว้าง dropdown */
+}
+.header-search .input {
+  border: 1px solid #E4E7ED;
+  border-left: none;
+  border-right: none;
+  padding: 10px 15px;
+  height: 44px;
+  flex: 1;
+  border-radius: 0; /* ✅ ไม่มีมุมโค้ง */
+}
+.header-search .search-btn {
+  border-radius: 0 30px 30px 0; /* ✅ โค้งเฉพาะด้านขวา */
+  background-color: #D10024;
+  color: #fff;
+  border: none;
+  padding: 0 25px;
+  font-weight: 600;
+  height: 44px;
+}
+.header-search .search-btn:hover {
+  background-color: #a7001c;
+}
+</style>
 
 
           <!-- 🟨 Wishlist / Cart -->
