@@ -1,10 +1,10 @@
 <?php
 session_start();
-include "connectdb.php";
+include("connectdb.php");
 
 // รับค่าค้นหา / หมวดหมู่
 $search = $_GET['search'] ?? '';
-$cat_id = $_GET['cat_id'] ?? '';
+$cat = $_GET['cat'] ?? '';
 
 // ดึงหมวดหมู่
 $cats = $conn->query("SELECT * FROM category ORDER BY cat_name ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -14,312 +14,147 @@ $sql = "SELECT p.*, c.cat_name
         FROM product p 
         LEFT JOIN category c ON p.cat_id = c.cat_id 
         WHERE 1";
-
 if (!empty($search)) $sql .= " AND p.p_name LIKE :search";
-if (!empty($cat_id)) $sql .= " AND p.cat_id = :cat_id";
-
+if (!empty($cat)) $sql .= " AND p.cat_id = :cat";
 $stmt = $conn->prepare($sql);
 if (!empty($search)) $stmt->bindValue(':search', "%$search%");
-if (!empty($cat_id)) $stmt->bindValue(':cat_id', $cat_id);
+if (!empty($cat)) $stmt->bindValue(':cat', $cat);
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>MyCommiss | หน้าร้าน</title>
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
+  <title>MyCommiss | สินค้าทั้งหมด</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/slick.css">
-  <link rel="stylesheet" href="css/slick-theme.css">
-  <link rel="stylesheet" href="css/nouislider.min.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <link rel="stylesheet" href="css/style.css">
-
   <style>
-  body { font-family: 'Montserrat', sans-serif; }
-
-  /* ✅ โลโก้ */
-  .header-logo h3 {
-    font-weight: 800;
-    line-height: 1.3;
-    margin: 0;
-  }
-
-  /* ✅ ช่องค้นหา */
-  .search-box {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border-radius: 30px;
-    overflow: hidden;
-    width: 100%;
-    height: 48px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border: 1px solid #e4e7ed;
-  }
-  .input-select {
-    border: none;
-    background: #fff;
-    color: #2B2D42;
-    font-weight: 500;
-    padding: 0 20px;
-    flex: 0 0 180px;
-    font-size: 15px;
-    height: 100%;
-    border-right: 1px solid #E4E7ED;
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg fill='%232B2D42' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 14px;
-  }
-  .input {
-    border: none;
-    outline: none;
-    background: #fff;
-    padding: 0 18px;
-    flex: 1;
-    font-size: 15px;
-    color: #2B2D42;
-  }
-  .input::placeholder { color: #888; }
-  .search-btn {
-    border: none;
-    background: #D10024;
-    color: #fff;
-    font-weight: 600;
-    font-size: 15px;
-    padding: 0 28px;
-    height: 100%;
-    border-radius: 0 30px 30px 0;
-    transition: all 0.2s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .search-btn:hover {
-    background-color: #a7001c;
-    transform: scale(1.02);
-  }
-
-  /* ✅ รูปสินค้า */
-  .product-img img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 10px;
-    transition: 0.3s ease;
-  }
-  .product-img img:hover {
-    transform: scale(1.05);
-  }
-
-  /* ✅ Wishlist / Cart */
-  .header-ctn {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 30px;
-  }
-  .header-ctn a {
-    color: #fff;
-    text-decoration: none;
-    text-align: center;
-  }
-  .header-ctn a:hover span {
-    color: #D10024;
-  }
+    body { font-family: 'Montserrat', sans-serif; background-color: #f8f9fa; }
+    .section-title h3 { font-weight: 700; }
+    .product-card {
+      transition: all 0.3s ease;
+      border-radius: 15px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    .product-img img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      border-bottom: 1px solid #eee;
+    }
+    .product-body {
+      padding: 15px;
+      text-align: center;
+    }
+    .product-body h6 {
+      font-weight: 600;
+      min-height: 45px;
+    }
+    .product-body p {
+      color: #d10024;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .btn-cart {
+      background: #d10024;
+      color: #fff;
+      border-radius: 30px;
+      padding: 6px 15px;
+      transition: 0.2s;
+    }
+    .btn-cart:hover {
+      background: #a7001c;
+      color: #fff;
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header>
-    <div id="top-header">
-      <div class="container">
-        <ul class="header-links pull-left">
-          <li><a href="#"><i class="fa fa-phone"></i> +66 81-234-5678</a></li>
-          <li><a href="#"><i class="fa fa-envelope-o"></i> support@mycommiss.com</a></li>
-          <li><a href="#"><i class="fa fa-map-marker"></i> Bangkok, Thailand</a></li>
-        </ul>
-        <ul class="header-links pull-right">
-          <?php if (isset($_SESSION['customer_id'])): ?>
-            <li><a href="profile.php"><i class="fa fa-user-o"></i> บัญชีของฉัน</a></li>
-            <li><a href="logout.php"><i class="fa fa-sign-out"></i> ออกจากระบบ</a></li>
-          <?php else: ?>
-            <li><a href="login.php"><i class="fa fa-sign-in"></i> เข้าสู่ระบบ</a></li>
-            <li><a href="register.php"><i class="fa fa-user-plus"></i> สมัครสมาชิก</a></li>
-          <?php endif; ?>
-        </ul>
-      </div>
+
+<!-- ✅ Header ธีมเดิม -->
+<?php include("navbar_user.php"); ?>
+
+<!-- 🔍 ส่วนค้นหา -->
+<div class="container mt-4">
+  <form class="row mb-4" method="get">
+    <div class="col-md-3">
+      <select name="cat" class="form-select">
+        <option value="">ทุกหมวดหมู่</option>
+        <?php foreach ($cats as $c): ?>
+          <option value="<?= $c['cat_id'] ?>" <?= $cat == $c['cat_id'] ? 'selected' : '' ?>>
+            <?= htmlspecialchars($c['cat_name']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
     </div>
-
-    <div id="header">
-      <div class="container">
-        <div class="row align-items-center">
-          <!-- โลโก้ -->
-          <div class="col-md-3">
-            <div class="header-logo text-center text-md-start">
-              <h3>
-                <b><u><span style="color:#D10024;">MyCommiss</span></u></b><br>
-                <b><u><span style="color:#ffffff;">MyCommiss</span></u></b><br>
-                <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b>
-              </h3>
-            </div>
-          </div>
-
-          <!-- ช่องค้นหา -->
-          <div class="col-md-6 d-flex justify-content-center align-items-center">
-            <div class="header-search w-100" style="max-width:750px;">
-              <form method="get" class="search-box d-flex">
-                <select name="cat_id" class="input-select">
-                  <option value="">ประเภทสินค้า</option>
-                  <?php foreach ($cats as $c): ?>
-                    <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
-                      <?= htmlspecialchars($c['cat_name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-                <input type="text" name="search" class="input" 
-                       value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
-                <button type="submit" class="search-btn"><i class="fa fa-search"></i> ค้นหา</button>
-              </form>
-            </div>
-          </div>
-
-          <!-- Wishlist / Cart -->
-          <div class="col-md-3">
-            <div class="header-ctn">
-              <div>
-                <a href="wishlist.php">
-                  <i class="fa fa-heart-o fa-lg"></i><br>
-                  <span>สินค้าที่ชอบ</span>
-                </a>
-              </div>
-              <div>
-                <a href="cart.php">
-                  <i class="fa fa-shopping-cart fa-lg"></i><br>
-                  <span>ตะกร้าของฉัน</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="col-md-7">
+      <input type="text" name="search" class="form-control" placeholder="ค้นหาสินค้า..."
+             value="<?= htmlspecialchars($search) ?>">
     </div>
-  </header>
+    <div class="col-md-2 d-grid">
+      <button class="btn btn-dark">🔍 ค้นหา</button>
+    </div>
+  </form>
+</div>
 
-<?php
-include("connectdb.php");
-
-// 🔹 ดึงข้อมูลสินค้าทั้งหมด
-$sql = "SELECT p.*, c.cat_name 
-        FROM product p 
-        LEFT JOIN category c ON p.cat_id = c.cat_id 
-        ORDER BY p_id DESC";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<!-- SECTION: สินค้าใหม่ -->
-<div class="section py-5">
+<!-- 🛍 แสดงสินค้า -->
+<div class="section py-4">
   <div class="container">
-    <div class="row mb-4 text-center">
-      <h3 class="fw-bold text-uppercase">🆕 สินค้าใหม่ล่าสุด</h3>
-      <p class="text-muted">เลือกซื้อสินค้า IT คุณภาพ ราคาคุ้มค่า จาก <span class="text-danger fw-bold">MyCommiss</span></p>
-    </div>
-
     <div class="row g-4">
-      <?php foreach ($products as $p): ?>
-        <?php
-          // ✅ ใช้ path เต็มจากคลาว
-          $imgPath = "http://212.80.215.29/admin/uploads/" . $p['p_image'];
-        ?>
-        <div class="col-lg-3 col-md-4 col-sm-6">
-          <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-            <div class="position-relative">
-              <img src="<?= htmlspecialchars($imgPath) ?>" 
-                   class="card-img-top" 
-                   style="height:230px;object-fit:cover;" 
-                   alt="<?= htmlspecialchars($p['p_name']) ?>">
+      <?php if (count($products) > 0): ?>
+        <?php foreach ($products as $p): ?>
+          <?php
+            $imgPath = "http://212.80.215.29/admin/uploads/" . $p['p_image'];
+          ?>
+          <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="product-card h-100">
+              <div class="product-img">
+                <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
+              </div>
+              <div class="product-body">
+                <small class="text-muted d-block mb-1"><?= htmlspecialchars($p['cat_name']) ?></small>
+                <h6><?= htmlspecialchars($p['p_name']) ?></h6>
+                <p><?= number_format($p['p_price'], 2) ?> บาท</p>
 
-              <span class="position-absolute top-0 end-0 bg-danger text-white small px-2 py-1 rounded-start">
-                <?= htmlspecialchars($p['cat_name']) ?>
-              </span>
-            </div>
+                <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-outline-dark btn-sm w-100 mb-2">
+                  🔍 ดูรายละเอียด
+                </a>
 
-            <div class="card-body text-center">
-              <h6 class="fw-semibold text-dark" style="min-height:48px;">
-                <?= htmlspecialchars($p['p_name']) ?>
-              </h6>
-              <p class="text-danger fw-bold fs-6 mb-2">
-                <?= number_format($p['p_price'], 2) ?> บาท
-              </p>
-            </div>
-
-            <div class="card-footer bg-white border-0 text-center pb-3">
-              <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-outline-dark btn-sm me-1">
-                🔍 ดูรายละเอียด
-              </a>
-              <form action="add_to_cart.php" method="post" class="d-inline">
-                <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
-                <button type="submit" class="btn btn-success btn-sm">
-                  🛒 เพิ่มในตะกร้า
-                </button>
-              </form>
+                <?php if (isset($_SESSION['customer_id'])): ?>
+                  <form method="post" action="cart_add.php">
+                    <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
+                    <button type="submit" class="btn btn-cart btn-sm w-100">🛒 เพิ่มในตะกร้า</button>
+                  </form>
+                <?php else: ?>
+                  <a href="login.php" class="btn btn-outline-secondary btn-sm w-100">🔑 เข้าสู่ระบบเพื่อสั่งซื้อ</a>
+                <?php endif; ?>
+              </div>
             </div>
           </div>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div class="text-center text-muted py-5">
+          😕 ไม่พบสินค้าที่ค้นหา
         </div>
-      <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   </div>
 </div>
 
-<!-- 💅 Style -->
-<style>
-.card {
-  transition: all 0.3s ease;
-}
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 15px rgba(0,0,0,0.15);
-}
-.card img {
-  transition: transform 0.3s ease;
-}
-.card:hover img {
-  transform: scale(1.05);
-}
-</style>
+<!-- ✅ Footer -->
+<footer id="footer" class="text-center py-3 bg-dark text-white">
+  © <?= date('Y') ?> MyCommiss | หน้าร้านสินค้า
+</footer>
 
-	
-
-		<!-- FOOTER -->
-		<footer id="footer">
-			<!-- top footer -->
-			<div class="section">
-				<!-- container -->
-				<div class="container">
-					<!-- row -->
-					<div class="row">
-						<div class="col-md-3 col-xs-6">
-							<div class="footer">
-		
-							</div>
-						</div>
-
-						
-							
-
-		<!-- jQuery Plugins -->
-		<script src="js/jquery.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/slick.min.js"></script>
-		<script src="js/nouislider.min.js"></script>
-		<script src="js/jquery.zoom.min.js"></script>
-		<script src="js/main.js"></script>
-
-	</body>
+<script src="js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
