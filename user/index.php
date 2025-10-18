@@ -2,14 +2,14 @@
 session_start();
 include("connectdb.php");
 
-// 🔹 รับค่าค้นหา
+// 🔍 รับค่าค้นหา
 $search = $_GET['search'] ?? '';
 $cat = $_GET['cat'] ?? '';
 
-// 🔹 ดึงข้อมูลหมวดหมู่
+// 🔹 ดึงหมวดหมู่
 $cats = $conn->query("SELECT * FROM category")->fetchAll(PDO::FETCH_ASSOC);
 
-// 🔹 ดึงข้อมูลสินค้า
+// 🔹 ดึงสินค้า
 $sql = "SELECT p.*, c.cat_name 
         FROM product p 
         LEFT JOIN category c ON p.cat_id = c.cat_id 
@@ -29,106 +29,178 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="UTF-8">
   <title>MyCommiss | หน้าร้าน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    .toast {
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #F6F7F8;
+      color: #2B2D42;
     }
-    .toast.show {
-      opacity: 1;
+
+    /* 🔹 Navbar */
+    .navbar {
+      background-color: #15161D;
+    }
+    .navbar-brand {
+      color: #FFF !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    .navbar-brand span {
+      color: #D10024;
+    }
+    .nav-link {
+      color: #FFF !important;
+      margin: 0 10px;
+      transition: 0.2s;
+    }
+    .nav-link:hover {
+      color: #D10024 !important;
+    }
+
+    /* 🔹 การ์ดสินค้า */
+    .product-card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #E4E7ED;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    }
+
+    .product-card img {
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid #E4E7ED;
+    }
+
+    .product-card .price {
+      color: #D10024;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .btn-red {
+      background-color: #D10024;
+      color: #FFF;
+      border-radius: 30px;
+      transition: 0.2s;
+    }
+    .btn-red:hover {
+      background-color: #a5001a;
+    }
+
+    footer {
+      background: #15161D;
+      color: #FFF;
+      padding: 20px 0;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .toast-container {
+      z-index: 3000;
     }
   </style>
 </head>
-<body class="bg-light">
-  <!-- 🔔 Toast แสดงเมื่อเพิ่มสินค้าสำเร็จ -->
-<?php if (isset($_SESSION['toast_success'])): ?>
-  <div class="toast-container position-fixed top-0 end-0 p-3">
-    <div class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">
-          <?= $_SESSION['toast_success'] ?>
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
+<body>
+
+<!-- 🔺 Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.php">My<span>Commiss</span></a>
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+      <i class="fa fa-bars"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a href="index.php" class="nav-link">หน้าแรก</a></li>
+        <li class="nav-item"><a href="store.php" class="nav-link active text-danger">หน้าร้าน</a></li>
+        <?php if(isset($_SESSION['customer_id'])): ?>
+          <li class="nav-item"><a href="profile.php" class="nav-link"><i class="fa fa-user"></i> <?= htmlspecialchars($_SESSION['customer_name']) ?></a></li>
+          <li class="nav-item"><a href="logout.php" class="nav-link"><i class="fa fa-sign-out-alt"></i> ออกจากระบบ</a></li>
+        <?php else: ?>
+          <li class="nav-item"><a href="login.php" class="nav-link"><i class="fa fa-sign-in-alt"></i> เข้าสู่ระบบ</a></li>
+        <?php endif; ?>
+      </ul>
     </div>
   </div>
-  <?php unset($_SESSION['toast_success']); ?>
-<?php endif; ?>
+</nav>
 
-<!-- 🔔 Toast แสดงเมื่อบันทึกโปรไฟล์สำเร็จ -->
-<?php if (isset($_SESSION['toast_success'])): ?>
-  <div class="toast-container position-fixed top-0 end-0 p-3">
-    <div class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+<!-- 🔔 Toast -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <?php if (isset($_SESSION['toast_success'])): ?>
+    <div class="toast align-items-center text-bg-success border-0 show">
       <div class="d-flex">
-        <div class="toast-body">
-          <?= $_SESSION['toast_success'] ?>
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="toast-body"><?= $_SESSION['toast_success'] ?></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
       </div>
     </div>
+    <?php unset($_SESSION['toast_success']); ?>
+  <?php endif; ?>
+</div>
+
+<!-- 🔍 Search Section -->
+<div class="container mt-5">
+  <div class="card border-0 shadow-sm p-4 mb-4">
+    <form class="row g-2 align-items-center" method="get">
+      <div class="col-md-3">
+        <select name="cat" class="form-select">
+          <option value="">หมวดหมู่ทั้งหมด</option>
+          <?php foreach ($cats as $c): ?>
+            <option value="<?= $c['cat_id'] ?>" <?= $cat == $c['cat_id'] ? 'selected' : '' ?>>
+              <?= htmlspecialchars($c['cat_name']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="col-md-7">
+        <input type="text" name="search" class="form-control" placeholder="ค้นหาชื่อสินค้า..." value="<?= htmlspecialchars($search) ?>">
+      </div>
+      <div class="col-md-2 d-grid">
+        <button class="btn btn-red"><i class="fa fa-search"></i> ค้นหา</button>
+      </div>
+    </form>
   </div>
-  <?php unset($_SESSION['toast_success']); ?>
-<?php endif; ?>
 
-<!-- ✅ Navbar ส่วนกลาง -->
-<?php include("navbar_user.php"); ?>
-
-<div class="container mt-4">
-  <!-- 🔍 ฟอร์มค้นหา -->
-  <form class="row mb-4" method="get">
-    <div class="col-md-4">
-      <select name="cat" class="form-select">
-        <option value="">-- เลือกหมวดหมู่ --</option>
-        <?php foreach ($cats as $c): ?>
-          <option value="<?= $c['cat_id'] ?>" <?= $cat == $c['cat_id'] ? 'selected' : '' ?>>
-            <?= htmlspecialchars($c['cat_name']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div class="col-md-6">
-      <input type="text" name="search" class="form-control" placeholder="ค้นหาสินค้า..." 
-             value="<?= htmlspecialchars($search) ?>">
-    </div>
-    <div class="col-md-2 d-grid">
-      <button class="btn btn-primary">ค้นหา</button>
-    </div>
-  </form>
-
-  <!-- 🛍 แสดงสินค้า -->
-  <div class="row row-cols-1 row-cols-md-4 g-4">
+  <!-- 🛒 แสดงสินค้า -->
+  <div class="row g-4">
     <?php if (count($products) > 0): ?>
       <?php foreach ($products as $p): ?>
         <?php
           $imagePath = "../admin/uploads/" . $p['p_image'];
           if (!file_exists($imagePath) || empty($p['p_image'])) {
-            $imagePath = "img/default.png"; // ใช้ภาพสำรอง
+            $imagePath = "img/default.png";
           }
         ?>
-        <div class="col">
-          <div class="card h-100 shadow-sm border-0">
-            <img src="<?= $imagePath ?>" class="card-img-top" style="height:200px;object-fit:cover;">
-            <div class="card-body">
-              <h6 class="card-title text-truncate" title="<?= htmlspecialchars($p['p_name']) ?>">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div class="product-card h-100">
+            <img src="<?= $imagePath ?>" alt="<?= htmlspecialchars($p['p_name']) ?>" class="w-100">
+            <div class="p-3">
+              <h6 class="text-truncate" title="<?= htmlspecialchars($p['p_name']) ?>">
                 <?= htmlspecialchars($p['p_name']) ?>
               </h6>
-              <p class="text-muted mb-2"><?= number_format($p['p_price'], 2) ?> บาท</p>
-              <a href="product_detail.php?id=<?= $p['p_id'] ?>" 
-                 class="btn btn-sm btn-outline-primary w-100">
-                ดูรายละเอียด
+              <p class="price mb-2"><?= number_format($p['p_price'], 2) ?> บาท</p>
+              <a href="product_detail.php?id=<?= $p['p_id'] ?>" class="btn btn-outline-dark btn-sm w-100 mb-2">
+                <i class="fa fa-eye"></i> ดูรายละเอียด
               </a>
 
               <?php if (isset($_SESSION['customer_id'])): ?>
-                <!-- ✅ ถ้าล็อกอินแล้ว แสดงปุ่มซื้อ -->
-                <form method="post" action="cart_add.php" class="mt-2">
+                <form method="post" action="cart_add.php">
                   <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
-                  <button type="submit" class="btn btn-success btn-sm w-100">🛒 หยิบใส่ตะกร้า</button>
+                  <button type="submit" class="btn btn-red btn-sm w-100">
+                    <i class="fa fa-cart-plus"></i> หยิบใส่ตะกร้า
+                  </button>
                 </form>
               <?php else: ?>
-                <!-- 🚫 ถ้ายังไม่ล็อกอิน -->
-                <a href="login.php" class="btn btn-outline-secondary btn-sm w-100 mt-2">
-                  🔑 เข้าสู่ระบบเพื่อสั่งซื้อ
+                <a href="login.php" class="btn btn-outline-secondary btn-sm w-100">
+                  <i class="fa fa-lock"></i> เข้าสู่ระบบเพื่อสั่งซื้อ
                 </a>
               <?php endif; ?>
             </div>
@@ -141,19 +213,19 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 </div>
 
-<footer class="text-center py-3 mt-5 bg-dark text-white">
+<footer>
   © <?= date('Y') ?> MyCommiss | หน้าร้าน
 </footer>
 
-<!-- ✅ Bootstrap Toast 5 วินาที -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-  const toastList = toastElList.map(function (toastEl) {
-    return new bootstrap.Toast(toastEl, { delay: 5000, autohide: true });
+  document.addEventListener("DOMContentLoaded", () => {
+    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    toastElList.forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl, { delay: 5000, autohide: true });
+      toast.show();
+    });
   });
-  toastList.forEach(toast => toast.show());
 </script>
-
 </body>
 </html>
