@@ -222,24 +222,33 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </nav>
 <?php
-<?php
-// 🔥 สินค้าขายดี Top 10 (จำลองโดยใช้ p_stock น้อยสุดก่อน)
-$topProducts = $conn->query("
-  SELECT p.*, c.cat_name 
-  FROM product p
-  LEFT JOIN category c ON p.cat_id = c.cat_id
-  ORDER BY p.p_stock ASC
-  LIMIT 10
-")->fetchAll(PDO::FETCH_ASSOC);
+// เปิดแสดง error (ใช้ได้ทั้งบน Cloud)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 
-// 🆕 สินค้าใหม่ล่าสุด 10
-$newProducts = $conn->query("
-  SELECT p.*, c.cat_name 
-  FROM product p
-  LEFT JOIN category c ON p.cat_id = c.cat_id
-  ORDER BY p.created_at DESC
-  LIMIT 10
-")->fetchAll(PDO::FETCH_ASSOC);
+// 🔥 ดึงสินค้าขายดี Top 10 (จำลองจาก stock เหลือน้อย)
+try {
+  $topProducts = $conn->query("
+    SELECT p.*, c.cat_name 
+    FROM product p
+    LEFT JOIN category c ON p.cat_id = c.cat_id
+    ORDER BY p.p_stock ASC
+    LIMIT 10
+  ")->fetchAll(PDO::FETCH_ASSOC);
+
+  // 🆕 ดึงสินค้าใหม่ล่าสุด 10 รายการ
+  $newProducts = $conn->query("
+    SELECT p.*, c.cat_name 
+    FROM product p
+    LEFT JOIN category c ON p.cat_id = c.cat_id
+    ORDER BY p.created_at DESC
+    LIMIT 10
+  ")->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  echo "<div style='color:red;text-align:center;margin-top:20px;'>❌ Database Error: " . htmlspecialchars($e->getMessage()) . "</div>";
+  exit;
+}
 ?>
 
 <!-- 🔥 สินค้าขายดี Top 10 -->
@@ -254,11 +263,10 @@ $newProducts = $conn->query("
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($topProducts as $p): ?>
       <?php
-        $uploadPath = "../admin/uploads/"; // ✅ เปลี่ยน path ให้ถูกกับฝั่ง user
         $imgFile = $p['p_image'];
-        $imgPath = (!empty($imgFile) && file_exists($uploadPath . $imgFile))
-          ? $uploadPath . $imgFile
-          : "img/default.png";
+        $uploadPath = __DIR__ . "/../admin/uploads/" . $imgFile;
+        $imgUrl = "../admin/uploads/" . $imgFile;
+        $imgPath = (file_exists($uploadPath) && !empty($imgFile)) ? $imgUrl : "img/default.png";
       ?>
       <div class="col">
         <div class="product text-center p-3 border rounded shadow-sm bg-white">
@@ -294,11 +302,10 @@ $newProducts = $conn->query("
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <?php foreach ($newProducts as $p): ?>
       <?php
-        $uploadPath = "../admin/uploads/"; 
         $imgFile = $p['p_image'];
-        $imgPath = (!empty($imgFile) && file_exists($uploadPath . $imgFile))
-          ? $uploadPath . $imgFile
-          : "img/default.png";
+        $uploadPath = __DIR__ . "/../admin/uploads/" . $imgFile;
+        $imgUrl = "../admin/uploads/" . $imgFile;
+        $imgPath = (file_exists($uploadPath) && !empty($imgFile)) ? $imgUrl : "img/default.png";
       ?>
       <div class="col">
         <div class="product text-center p-3 border rounded shadow-sm bg-white">
