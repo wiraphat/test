@@ -48,34 +48,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <title>โปรไฟล์ของฉัน | MyCommiss</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- ✅ ใช้ฟอนต์เดียวกับหน้า index -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
+
+  <!-- ✅ Bootstrap + Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
   <style>
     body {
       background-color: #0F111A;
-      font-family: 'Prompt', sans-serif;
+      font-family: 'Montserrat', sans-serif; /* ✅ เหมือนหน้า index */
       color: #FFF;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* 🔹 กล่องโปรไฟล์ */
+    /* กล่องโปรไฟล์ */
     .profile-card {
       max-width: 720px;
       margin: 60px auto;
       background: #1E1F29;
       border-radius: 20px;
       border: 1px solid #D10024;
-      box-shadow: 0 0 15px rgba(209, 0, 36, 0.4);
+      box-shadow: 0 0 15px rgba(209,0,36,0.4);
       transition: 0.3s;
     }
-
     .profile-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 0 30px rgba(209, 0, 36, 0.7);
+      box-shadow: 0 0 30px rgba(209,0,36,0.7);
     }
 
     .card-header {
@@ -87,54 +90,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
     }
 
-    /* 🔹 ฟอร์ม */
-    .form-label {
-      color: #E4E7ED;
-      font-weight: 500;
-    }
-
-    .form-control, textarea {
+    .form-label { color: #E4E7ED; font-weight: 500; }
+    .form-control {
       background-color: #2B2D42;
       color: #FFF;
       border: 1px solid #444;
       border-radius: 10px;
     }
-
     .form-control:focus {
       border-color: #D10024;
       box-shadow: 0 0 0 2px rgba(209,0,36,0.3);
     }
 
-    /* 🔹 ปุ่ม */
-    .btn-primary {
-      background-color: #D10024;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-    }
+    /* ปุ่ม */
+    .btn-primary { background-color: #D10024; border: none; border-radius: 10px; font-weight: 600; }
     .btn-primary:hover { background-color: #a7001c; }
 
-    .btn-success {
-      background-color: #00B894;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-    }
+    .btn-success { background-color: #00B894; border: none; border-radius: 10px; font-weight: 600; }
     .btn-success:hover { background-color: #009774; }
 
-    .btn-secondary {
-      background-color: #2B2D42;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      color: #FFF;
-    }
+    .btn-secondary { background-color: #2B2D42; border: none; border-radius: 10px; font-weight: 600; color: #FFF; }
     .btn-secondary:hover { background-color: #1E1F29; }
 
-    /* 🔹 Toast */
-    .toast-container { z-index: 3000; }
-
-    /* 🔹 Footer */
     footer {
       background-color: #1E1F29;
       color: #FFF;
@@ -146,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   </style>
 </head>
+
 <body>
 
 <?php include("navbar_user.php"); ?>
