@@ -136,7 +136,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="header">
       <div class="container">
         <div class="row align-items-center">
-          <!-- 🟥 โลโก้ -->
+          <!--  โลโก้ -->
           <div class="col-md-3">
             <div class="header-logo text-center text-md-start">
               <h3>
@@ -169,45 +169,67 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <style>
 /* ✅ ให้ dropdown + ช่องค้นหา + ปุ่มติดกัน */
+/* 🎯 ปรับช่องค้นหาให้เรียงเท่ากันทุกช่อง */
 .header-search {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .header-search form {
   display: flex;
+  align-items: stretch; /* ✅ ให้สูงเท่ากันเป๊ะ */
   width: 100%;
 }
+
 .header-search .input-select {
   border: 1px solid #E4E7ED;
-  border-right: none; /* ❌ เอาขอบขวาออกให้ติดกับ input */
-  border-radius: 30px 0 0 30px; /* ✅ โค้งด้านซ้าย */
-  padding: 10px 15px;
-  height: 44px;
+  border-right: none;
+  border-radius: 30px 0 0 30px;
+  padding: 0 15px;           /* ✅ ปรับ padding แนวนอน */
+  height: 46px;              /* ✅ เท่ากับ input */
   background: #fff;
-  flex: 0 0 170px; /* ✅ กำหนดความกว้าง dropdown */
+  flex: 0 0 170px;
+  font-size: 14px;
+  line-height: 1.2;
+  appearance: none;          /* ✅ ซ่อนสไตล์ default browser */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='10' viewBox='0 0 24 24' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
 }
+
 .header-search .input {
   border: 1px solid #E4E7ED;
   border-left: none;
   border-right: none;
-  padding: 10px 15px;
-  height: 44px;
+  padding: 0 15px;
+  height: 46px;
   flex: 1;
-  border-radius: 0; /* ✅ ไม่มีมุมโค้ง */
+  border-radius: 0;
+  font-size: 14px;
 }
+
 .header-search .search-btn {
-  border-radius: 0 30px 30px 0; /* ✅ โค้งเฉพาะด้านขวา */
+  border-radius: 0 30px 30px 0;
   background-color: #D10024;
   color: #fff;
   border: none;
   padding: 0 25px;
   font-weight: 600;
-  height: 44px;
+  height: 46px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .header-search .search-btn:hover {
   background-color: #a7001c;
 }
+
 </style>
 
 
