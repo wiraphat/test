@@ -147,23 +147,26 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
           </div>
 
+         
           <!-- 🟦 ช่องค้นหา -->
-          <div class="col-md-6">
-            <div class="header-search">
-              <form class="d-flex" method="get">
-                <select name="cat_id" class="input-select">
-                  <option value="">ทุกหมวดหมู่</option>
-                  <?php foreach ($cats as $c): ?>
-                    <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
-                      <?= htmlspecialchars($c['cat_name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-                <input class="input" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
-                <button class="search-btn">ค้นหา</button>
-              </form>
-            </div>
-          </div>
+<div class="col-md-6 d-flex justify-content-center align-items-center">
+  <div class="header-search w-100" style="max-width:600px;">
+    <form method="get" class="d-flex w-100">
+      <select name="cat_id" class="input-select">
+        <option value="">ทุกหมวดหมู่</option>
+        <?php foreach ($cats as $c): ?>
+          <option value="<?= $c['cat_id'] ?>" <?= $cat_id == $c['cat_id'] ? 'selected' : '' ?>>
+            <?= htmlspecialchars($c['cat_name']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+      <input type="text" name="search" class="input" value="<?= htmlspecialchars($search) ?>" placeholder="ค้นหาสินค้า...">
+      <button type="submit" class="search-btn">ค้นหา</button>
+      
+    </form>
+  </div>
+</div>
+
 
           <!-- 🟨 Wishlist / Cart -->
           <div class="col-md-3">
