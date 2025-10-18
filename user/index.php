@@ -964,8 +964,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					<div class="row">
 						<div class="col-md-3 col-xs-6">
 							<div class="footer">
-								<h3 class="footer-title">About Us</h3>
-								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.</p>
+								<h3 class="footer-title">เมนูหลัก</h3>
 		
 							</div>
 						</div>
