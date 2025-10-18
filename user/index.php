@@ -223,179 +223,68 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </nav>
 
 
-		<!-- 🔹 NEW PRODUCTS SECTION -->
-<div class="section">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="section-title">
-          <h3 class="title">New Products</h3>
-          <div class="section-nav">
-            <ul class="section-tab-nav tab-nav">
-              <li class="active"><a data-toggle="tab" href="#tab1">All</a></li>
-            </ul>
-          </div>
+		<div id="tab1" class="tab-pane active">
+  <!-- slick container -->
+  <div class="products-slick" data-nav="#slick-nav-1">
+
+    <?php
+    $sql_new = "SELECT p.*, c.cat_name 
+                FROM product p 
+                LEFT JOIN category c ON p.cat_id = c.cat_id 
+                ORDER BY p.p_id DESC LIMIT 10";
+    $newProducts = $conn->query($sql_new)->fetchAll(PDO::FETCH_ASSOC);
+    ?>
+
+    <?php foreach ($newProducts as $p): ?>
+    <div class="product">
+      <div class="product-img">
+        <img src="uploads/<?= htmlspecialchars($p['p_image']) ?>" 
+             alt="<?= htmlspecialchars($p['p_name']) ?>">
+        <div class="product-label">
+          <?php if (!empty($p['discount'])): ?>
+            <span class="sale">-<?= $p['discount'] ?>%</span>
+          <?php endif; ?>
+          <span class="new">NEW</span>
         </div>
       </div>
 
-      <div class="col-md-12">
-        <div class="row">
-          <div class="products-tabs">
-            <div id="tab1" class="tab-pane active">
-              <div class="products-slick" data-nav="#slick-nav-1">
+      <div class="product-body">
+        <p class="product-category"><?= htmlspecialchars($p['cat_name']) ?></p>
+        <h3 class="product-name">
+          <a href="product_detail.php?id=<?= $p['p_id'] ?>">
+            <?= htmlspecialchars($p['p_name']) ?>
+          </a>
+        </h3>
+        <h4 class="product-price">
+          ฿<?= number_format($p['price'], 2) ?>
+          <?php if (!empty($p['old_price'])): ?>
+            <del class="product-old-price">฿<?= number_format($p['old_price'], 2) ?></del>
+          <?php endif; ?>
+        </h4>
 
-                <?php
-                // ✅ ดึงสินค้าล่าสุด 10 รายการ
-                $sql_new = "SELECT p.*, c.cat_name 
-                            FROM product p 
-                            LEFT JOIN category c ON p.cat_id = c.cat_id 
-                            ORDER BY p.p_id DESC LIMIT 10";
-                $newProducts = $conn->query($sql_new)->fetchAll(PDO::FETCH_ASSOC);
-
-                foreach ($newProducts as $p):
-                ?>
-                <div class="product">
-                  <div class="product-img">
-                    <img src="uploads/<?= htmlspecialchars($p['p_image']) ?>" 
-                         alt="<?= htmlspecialchars($p['p_name']) ?>">
-                    <div class="product-label">
-                      <?php if (!empty($p['discount'])): ?>
-                        <span class="sale">-<?= $p['discount'] ?>%</span>
-                      <?php endif; ?>
-                      <span class="new">NEW</span>
-                    </div>
-                  </div>
-
-                  <div class="product-body">
-                    <p class="product-category"><?= htmlspecialchars($p['cat_name']) ?></p>
-                    <h3 class="product-name">
-                      <a href="product_detail.php?id=<?= $p['p_id'] ?>">
-                        <?= htmlspecialchars($p['p_name']) ?>
-                      </a>
-                    </h3>
-                    <h4 class="product-price">
-                      ฿<?= number_format($p['price'], 2) ?>
-                      <?php if (!empty($p['old_price'])): ?>
-                        <del class="product-old-price">฿<?= number_format($p['old_price'], 2) ?></del>
-                      <?php endif; ?>
-                    </h4>
-
-                    <div class="product-rating">
-                      <?php for ($i = 0; $i < 5; $i++): ?>
-                        <i class="fa fa-star<?= $i < ($p['rating'] ?? 0) ? '' : '-o' ?>"></i>
-                      <?php endfor; ?>
-                    </div>
-
-                    <div class="product-btns">
-                      <button class="add-to-wishlist"><i class="fa fa-heart-o"></i></button>
-                      <button class="add-to-compare"><i class="fa fa-exchange"></i></button>
-                      <button class="quick-view"><i class="fa fa-eye"></i></button>
-                    </div>
-                  </div>
-
-                  <div class="add-to-cart">
-                    <button class="add-to-cart-btn">
-                      <i class="fa fa-shopping-cart"></i> เพิ่มลงตะกร้า
-                    </button>
-                  </div>
-                </div>
-                <?php endforeach; ?>
-
-              </div>
-              <div id="slick-nav-1" class="products-slick-nav"></div>
-            </div>
-          </div>
+        <div class="product-rating">
+          <?php for ($i=0; $i<5; $i++): ?>
+            <i class="fa fa-star<?= $i < ($p['rating'] ?? 0) ? '' : '-o' ?>"></i>
+          <?php endfor; ?>
         </div>
+
+        <div class="product-btns">
+          <button class="add-to-wishlist"><i class="fa fa-heart-o"></i></button>
+          <button class="add-to-compare"><i class="fa fa-exchange"></i></button>
+          <button class="quick-view"><i class="fa fa-eye"></i></button>
+        </div>
+      </div>
+
+      <div class="add-to-cart">
+        <button class="add-to-cart-btn">
+          <i class="fa fa-shopping-cart"></i> Add to cart
+        </button>
       </div>
     </div>
+    <?php endforeach; ?>
+
   </div>
-</div>
-
-<!-- 🔹 TOP SELLING SECTION -->
-<div class="section">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="section-title">
-          <h3 class="title">Top Selling</h3>
-          <div class="section-nav">
-            <ul class="section-tab-nav tab-nav">
-              <li class="active"><a data-toggle="tab" href="#tab2">All</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-12">
-        <div class="row">
-          <div class="products-tabs">
-            <div id="tab2" class="tab-pane fade in active">
-              <div class="products-slick" data-nav="#slick-nav-2">
-
-                <?php
-                // ✅ ดึงสินค้าขายดี (เรียงตาม sold มากสุด)
-                $sql_top = "SELECT p.*, c.cat_name 
-                            FROM product p 
-                            LEFT JOIN category c ON p.cat_id = c.cat_id 
-                            ORDER BY p.sold DESC LIMIT 10";
-                $topSelling = $conn->query($sql_top)->fetchAll(PDO::FETCH_ASSOC);
-
-                foreach ($topSelling as $p):
-                ?>
-                <div class="product">
-                  <div class="product-img">
-                    <img src="uploads/<?= htmlspecialchars($p['p_image']) ?>" 
-                         alt="<?= htmlspecialchars($p['p_name']) ?>">
-                    <div class="product-label">
-                      <?php if (!empty($p['discount'])): ?>
-                        <span class="sale">-<?= $p['discount'] ?>%</span>
-                      <?php endif; ?>
-                    </div>
-                  </div>
-
-                  <div class="product-body">
-                    <p class="product-category"><?= htmlspecialchars($p['cat_name']) ?></p>
-                    <h3 class="product-name">
-                      <a href="product_detail.php?id=<?= $p['p_id'] ?>">
-                        <?= htmlspecialchars($p['p_name']) ?>
-                      </a>
-                    </h3>
-                    <h4 class="product-price">
-                      ฿<?= number_format($p['price'], 2) ?>
-                      <?php if (!empty($p['old_price'])): ?>
-                        <del class="product-old-price">฿<?= number_format($p['old_price'], 2) ?></del>
-                      <?php endif; ?>
-                    </h4>
-
-                    <div class="product-rating">
-                      <?php for ($i = 0; $i < 5; $i++): ?>
-                        <i class="fa fa-star<?= $i < ($p['rating'] ?? 0) ? '' : '-o' ?>"></i>
-                      <?php endfor; ?>
-                    </div>
-
-                    <div class="product-btns">
-                      <button class="add-to-wishlist"><i class="fa fa-heart-o"></i></button>
-                      <button class="add-to-compare"><i class="fa fa-exchange"></i></button>
-                      <button class="quick-view"><i class="fa fa-eye"></i></button>
-                    </div>
-                  </div>
-
-                  <div class="add-to-cart">
-                    <button class="add-to-cart-btn">
-                      <i class="fa fa-shopping-cart"></i> เพิ่มลงตะกร้า
-                    </button>
-                  </div>
-                </div>
-                <?php endforeach; ?>
-
-              </div>
-              <div id="slick-nav-2" class="products-slick-nav"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="slick-nav-1" class="products-slick-nav"></div>
 </div>
 
 	
