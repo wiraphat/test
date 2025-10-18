@@ -66,12 +66,18 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <div class="container">
         <div class="row">
           <!-- LOGO -->
-          <h3 style="text-align:center; font-weight:800; line-height:1.6;">
+          <div class="col-md-3">
+            <div class="header-logo">
+            
+             <h3 s>
   <b><u><span style="color:#D10024;">MyCommiss</span></u></b><br>
   <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b><br>
   <b><u><span style="color:#000;">MyCommiss</span></u></b>
 </h3>
 
+              
+            </div>
+          </div>
 
           <!-- SEARCH BAR -->
           <div class="col-md-6">
