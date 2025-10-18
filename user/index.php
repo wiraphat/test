@@ -71,31 +71,61 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
              <h3 s>
   <b><u><span style="color:#D10024;">MyCommiss</span></u></b><br>
-  <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b><br>
-  <b><u><span style="color:#ffffff;">MyCommiss</span></u></b>
+  <b><u><span style="color:#ffffff;">MyCommiss</span></u></b><br>
+  <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b>
 </h3>
 
               
             </div>
           </div>
 
-          <!-- SEARCH BAR -->
-          <div class="col-md-6">
-            <div class="header-search">
-              <form method="get">
-                <select name="cat_id" class="input-select">
-                  <option value="">ทุกหมวดหมู่</option>
-                  <?php foreach ($cats as $c): ?>
-                    <option value="<?= $c['cat_id'] ?>" <?= ($cat_id == $c['cat_id']) ? 'selected' : '' ?>>
-                      <?= htmlspecialchars($c['cat_name']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-                <input class="input" name="search" placeholder="ค้นหาสินค้า..." value="<?= htmlspecialchars($search) ?>">
-                <button class="search-btn">ค้นหา</button>
-              </form>
-            </div>
-          </div>
+          <div class="header-search">
+  <form class="d-flex">
+    <select class="input-select">
+      <option value="0">ทุกหมวดหมู่</option>
+    </select>
+    <input class="input" placeholder="ค้นหาสินค้า...">
+    <button class="search-btn">ค้นหา</button>
+  </form>
+</div>
+
+<style>
+/* ✅ ให้ช่องติดกัน */
+.header-search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-search .input-select {
+  border-radius: 30px 0 0 30px !important;
+  border: 1px solid #E4E7ED;
+  border-right: none;
+  padding: 10px 15px;
+  height: 42px;
+  background: #fff;
+}
+.header-search .input {
+  border: 1px solid #E4E7ED;
+  border-left: none;
+  border-right: none;
+  padding: 10px 15px;
+  height: 42px;
+  flex: 1;
+  border-radius: 0;
+}
+.header-search .search-btn {
+  border-radius: 0 30px 30px 0 !important;
+  background-color: #D10024;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-weight: 600;
+}
+.header-search .search-btn:hover {
+  background-color: #a7001c;
+}
+</style>
+
 
           <!-- ACCOUNT -->
           <div class="col-md-3 clearfix">
