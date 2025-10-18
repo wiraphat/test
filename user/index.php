@@ -222,12 +222,12 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </nav>
 <?php
-// เปิดแสดง error ให้ดูถ้ามีปัญหา
+// เปิดแสดง error
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-// 🔥 ดึงสินค้าขายดี Top 10 (จำลองจาก stock เหลือน้อยสุด)
+// 🔥 ดึงสินค้าขายดี Top 10 (จำลองจากสินค้าที่มี stock น้อยสุด)
 try {
   $topProducts = $conn->query("
     SELECT p.*, c.cat_name 
@@ -264,12 +264,10 @@ try {
     <?php foreach ($topProducts as $p): ?>
       <?php
         $imgFile = trim($p['p_image']);
-        // ✅ URL เต็มของไฟล์บน Cloud
+        // ✅ ใช้ URL เต็มตรงจากเว็บ Cloud
         $imgUrl = "http://212.80.215.29/test/admin/uploads/" . $imgFile;
-        $uploadPath = "/var/www/html/test/admin/uploads/" . $imgFile;
-
-        // ✅ ถ้าไม่มีไฟล์จริง ให้ใช้ default.png
-        if (empty($imgFile) || !file_exists($uploadPath)) {
+        // ✅ ถ้าไม่มีชื่อไฟล์หรือไฟล์ไม่เจอ ให้ใช้ default.png
+        if (empty($imgFile)) {
           $imgUrl = "img/default.png";
         }
       ?>
@@ -278,6 +276,7 @@ try {
           <div class="product-img mb-2">
             <img src="<?= htmlspecialchars($imgUrl) ?>" 
                  alt="<?= htmlspecialchars($p['p_name']) ?>" 
+                 onerror="this.src='img/default.png';"
                  style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
           </div>
           <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
@@ -308,9 +307,7 @@ try {
       <?php
         $imgFile = trim($p['p_image']);
         $imgUrl = "http://212.80.215.29/test/admin/uploads/" . $imgFile;
-        $uploadPath = "/var/www/html/test/admin/uploads/" . $imgFile;
-
-        if (empty($imgFile) || !file_exists($uploadPath)) {
+        if (empty($imgFile)) {
           $imgUrl = "img/default.png";
         }
       ?>
@@ -319,6 +316,7 @@ try {
           <div class="product-img mb-2">
             <img src="<?= htmlspecialchars($imgUrl) ?>" 
                  alt="<?= htmlspecialchars($p['p_name']) ?>" 
+                 onerror="this.src='img/default.png';"
                  style="width:100%;height:220px;object-fit:cover;border-radius:10px;">
           </div>
           <p class="text-muted small mb-1"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
@@ -334,6 +332,7 @@ try {
   </div>
   <?php endif; ?>
 </div>
+
 
 
 
