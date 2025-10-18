@@ -36,6 +36,62 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="css/nouislider.min.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* ✅ ช่องค้นหา */
+    .header-search {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .header-search .input-select {
+      border-radius: 30px 0 0 30px !important;
+      border: 1px solid #E4E7ED;
+      border-right: none;
+      padding: 10px 15px;
+      height: 42px;
+      background: #fff;
+    }
+    .header-search .input {
+      border: 1px solid #E4E7ED;
+      border-left: none;
+      border-right: none;
+      padding: 10px 15px;
+      height: 42px;
+      flex: 1;
+      border-radius: 0;
+    }
+    .header-search .search-btn {
+      border-radius: 0 30px 30px 0 !important;
+      background-color: #D10024;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 600;
+    }
+    .header-search .search-btn:hover {
+      background-color: #a7001c;
+    }
+
+    /* ✅ header alignment */
+    #header .row {
+      align-items: center;
+    }
+    .header-ctn {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 30px;
+    }
+    .header-ctn a {
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+    }
+    .header-ctn a:hover span {
+      color: #D10024;
+    }
+  </style>
 </head>
 <body>
   <!-- HEADER -->
@@ -64,174 +120,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- MAIN HEADER -->
     <div id="header">
       <div class="container">
-        <div class="row">
-          <!-- LOGO -->
+        <div class="row align-items-center">
+          <!-- 🟥 โลโก้ -->
           <div class="col-md-3">
-            <div class="header-logo">
-            
-             <h3 s>
-  <b><u><span style="color:#D10024;">MyCommiss</span></u></b><br>
-  <b><u><span style="color:#ffffff;">MyCommiss</span></u></b><br>
-  <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b>
-</h3>
-
-              
-            </div>
-          </div>
-
-          <div class="header-search">
-  <form class="d-flex">
-    <select class="input-select">
-      <option value="0">ทุกหมวดหมู่</option>
-    </select>
-    <input class="input" placeholder="ค้นหาสินค้า...">
-    <button class="search-btn">ค้นหา</button>
-  </form>
-</div>
-
-<style>
-/* ✅ ให้ช่องติดกัน */
-.header-search {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.header-search .input-select {
-  border-radius: 30px 0 0 30px !important;
-  border: 1px solid #E4E7ED;
-  border-right: none;
-  padding: 10px 15px;
-  height: 42px;
-  background: #fff;
-}
-.header-search .input {
-  border: 1px solid #E4E7ED;
-  border-left: none;
-  border-right: none;
-  padding: 10px 15px;
-  height: 42px;
-  flex: 1;
-  border-radius: 0;
-}
-.header-search .search-btn {
-  border-radius: 0 30px 30px 0 !important;
-  background-color: #D10024;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  font-weight: 600;
-}
-.header-search .search-btn:hover {
-  background-color: #a7001c;
-}
-</style>
-
-
-          <!-- ACCOUNT -->
-          <div class="col-md-3 clearfix">
-            <div class="header-ctn">
-              <div>
-                <a href="wishlist.php">
-                  <i class="fa fa-heart-o"></i>
-                  <span>สินค้าที่ชอบ</span>
-                </a>
-              </div>
-
-              <div>
-                <a href="cart.php">
-                  <i class="fa fa-shopping-cart"></i>
-                  <span>ตะกร้าของฉัน</span>
-                </a>
-              </div>
-
-              <div class="menu-toggle">
-                <a href="#"><i class="fa fa-bars"></i><span>เมนู</span></a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-  <!-- /HEADER -->
-
-  <!-- NAVIGATION -->
-<nav id="navigation">
-  <div class="container">
-    <div id="responsive-nav">
-      <ul class="main-nav nav navbar-nav">
-        <li class="active"><a href="index.php">หน้าหลัก</a></li>
-        <li><a href="#">โปรโมชั่น</a></li>
-     
-      </ul>
-    </div>
-  </div>
-</nav>
-<!-- /NAVIGATION -->
-
-
-  <!-- SECTION: PRODUCT LIST -->
-  <div class="section">
-    <div class="container">
-      <div class="row">
-        <?php if ($products): ?>
-          <?php foreach ($products as $p): ?>
-            <div class="col-md-3 col-xs-6">
-              <div class="product">
-                <div class="product-img">
-                  <?php
-                    $imgPath = "../admin/uploads/" . $p['p_image'];
-                    if (!file_exists($imgPath) || empty($p['p_image'])) $imgPath = "img/default.png";
-                  ?>
-                  <img src="<?= $imgPath ?>" alt="<?= htmlspecialchars($p['p_name']) ?>">
-                  <div class="product-label"><span class="new">NEW</span></div>
-                </div>
-                <div class="product-body">
-                  <p class="product-category"><?= htmlspecialchars($p['cat_name'] ?? '-') ?></p>
-                  <h3 class="product-name">
-                    <a href="product_detail.php?id=<?= $p['p_id'] ?>">
-                      <?= htmlspecialchars($p['p_name']) ?>
-                    </a>
-                  </h3>
-                  <h4 class="product-price"><?= number_format($p['p_price'], 2) ?> บาท</h4>
-                </div>
-                <div class="add-to-cart">
-                  <?php if (isset($_SESSION['customer_id'])): ?>
-                    <form method="post" action="cart_add.php">
-                      <input type="hidden" name="id" value="<?= $p['p_id'] ?>">
-                      <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> หยิบใส่ตะกร้า</button>
-                    </form>
-                  <?php else: ?>
-                    <a href="login.php" class="add-to-cart-btn"><i class="fa fa-sign-in"></i> เข้าสู่ระบบก่อน</a>
-                  <?php endif; ?>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <p class="text-center text-muted">ไม่พบสินค้า</p>
-        <?php endif; ?>
-      </div>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer id="footer">
-    <div class="section">
-      <div class="container text-center">
-        <span class="copyright">
-          © <?= date('Y') ?> MyCommiss | หน้าเเรก <a href="#">Electro Theme</a>
-        </span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- JS -->
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/slick.min.js"></script>
-  <script src="js/nouislider.min.js"></script>
-  <script src="js/jquery.zoom.min.js"></script>
-  <script src="js/main.js"></script>
-</body>
-</html>
+            <div class="hea
