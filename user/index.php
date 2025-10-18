@@ -72,7 +72,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
              <h3 s>
   <b><u><span style="color:#D10024;">MyCommiss</span></u></b><br>
   <b><u><span style="color:#2B2D42;">MyCommiss</span></u></b><br>
-  <b><u><span style="color:#000;">MyCommiss</span></u></b>
+  <b><u><span style="color:#ffffff;">MyCommiss</span></u></b>
 </h3>
 
               
